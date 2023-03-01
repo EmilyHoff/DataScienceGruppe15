@@ -1,4 +1,4 @@
-from part1Requirements import *
+from libs import *
 
 def basicFiltering(csvFile):
     df = pd.read_csv(csvFile)
