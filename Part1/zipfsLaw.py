@@ -1,13 +1,3 @@
-import numpy as np
-import pandas as pd
-import nltk
-from collections import defaultdict
-import math
-import re 
-pd.options.mode.chained_assignment = None
-
-nltk.download('punkt')
-nltk.download('stopwords')
 
 
 def commonWords(csvFile,quantiles=[0.05,0.95],generateGraph=True):
@@ -49,7 +39,7 @@ def commonWords(csvFile,quantiles=[0.05,0.95],generateGraph=True):
       
       return df
               
-              
+###     
               
               
               
