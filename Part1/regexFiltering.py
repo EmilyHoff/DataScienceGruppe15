@@ -1,7 +1,16 @@
-from part1Requirements import *
+import numpy as np
+import pandas as pd
+import nltk
+from collections import defaultdict
+import math
+import re 
+pd.options.mode.chained_assignment = None
 
-def basicFiltering(csvFile):
-    df = pd.read_csv(csvFile)
+nltk.download('punkt')
+nltk.download('stopwords')
+
+
+def basicFiltering(df):
     for y in ["content"]:
         for x in range(0,len(df)):
             try:
@@ -31,5 +40,6 @@ def basicFiltering(csvFile):
                 df[y][x] = re.sub(r"[^\s\w\d]", "", str(df[y][x])) #remove punctuation
 
             except:
-                pass
+                if not isinstance(df["content"][x],str):
+                    df[y][x] = ""
     return df
