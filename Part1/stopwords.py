@@ -1,22 +1,25 @@
+import sys
 import pandas as pd
 import numpy as np
 import nltk
-from nltk.corpus import stopwords
-from nltk import word_tokenize
 import re
+from collections import defaultdict
+import math
+import re 
+
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
 
 nltk.download('punkt')
 nltk.download('stopwords')
+nltk.download('averaged_perceptron_tagger')
+nltk.download("wordnet")
+nltk.download('omw-1.4')
 
-def remove_stopwords(csvfile):
+def removeStopwords(df):
     stop_words = set(stopwords.words('english'))
-    df = pd.read_csv(csvfile)
-    contents = df['content']
-    i = 0
-
-    for cell in contents:
-        tokens = word_tokenize(cell)
-        filtered = [word for word in tokens if not word in stop_words]
-        contents[i] = (' ').join(filtered)
-        i += 1
+    tokens = word_tokenize(df["content"])
+    df["content"] = ' '.join([word for word in tokens if not word in stop_words])
     return df

@@ -1,19 +1,25 @@
-from enum import EnumMeta
-from os import remove
-import numpy as np
+import sys
 import pandas as pd
+import numpy as np
 import nltk
+import re
 from collections import defaultdict
 import math
 import re 
-from scipy.stats import norm
-pd.options.mode.chained_assignment = None
+
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
 
 nltk.download('punkt')
 nltk.download('stopwords')
+nltk.download('averaged_perceptron_tagger')
+nltk.download("wordnet")
+nltk.download('omw-1.4')
 
-def commonWords(df,quantiles=[0.05,0.95],generateGraph=True):
-  #df = df[:5]
+def zipfsFiltering(df,quantiles=[0.05,0.95],generateGraph=True):
+  #df["content"] = df["content"].lower()
   for y in ["content"]:
     tokens = nltk.tokenize.word_tokenize(df[y])
     allWordsDist = nltk.FreqDist(w.lower() for w in tokens)

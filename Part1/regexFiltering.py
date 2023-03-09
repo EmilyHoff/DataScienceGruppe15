@@ -1,20 +1,27 @@
-import numpy as np
+import sys
 import pandas as pd
+import numpy as np
 import nltk
+import re
 from collections import defaultdict
 import math
 import re 
-pd.options.mode.chained_assignment = None
+
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
 
 nltk.download('punkt')
 nltk.download('stopwords')
+nltk.download('averaged_perceptron_tagger')
+nltk.download("wordnet")
+nltk.download('omw-1.4')
 
-
-def basicFiltering(df):
+def keywordFiltering(df):
     for y in ["content"]:
         try:
             df[y] = str(df[y]).lower() #make lowercase
-            df[y] = re.sub(r" {2,}"," ",str(df[y])) #Remove extra white space
             df[y] = re.sub(r"\t"," ",str(df[y])) #Remove tab
             df[y] = re.sub(r"\n"," ",str(df[y])) #Remove newline
             
@@ -37,8 +44,9 @@ def basicFiltering(df):
             df[y] = re.sub(r"[0-9]+[\.|,|:|0-9]*","<NUM>",str(df[y])) #Remove num
 
             df[y] = re.sub(r"[^\s\w\d]", "", str(df[y])) #remove punctuation
+            df[y] = re.sub(r" {2,}"," ",str(df[y])) #Remove extra white space
 
         except:
-            if not isinstance(df["content"][x],str):
+            if not isinstance(df["content"],str):
                 df[y] = ""
     return df
