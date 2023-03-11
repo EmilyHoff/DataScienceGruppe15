@@ -31,12 +31,15 @@ def zipfsFiltering(df,quantiles=[0.05,0.95],generateGraph=True):
     wordCount = [x[1] for x in words]
     lower = int(np.percentile(wordCount,100*(quantiles[0])))
     upper = int(np.percentile(wordCount,100*(quantiles[1])))
-      
+    
     for word in words:
       if word[1] >= upper:
         df[y] = df[y].replace(f" {word[0]} "," ")
+        words.remove(word)
       elif word[1] <= lower:
         df[y] = df[y].replace(f" {word[0]} "," ")
+        words.remove(word)
+    
       
   return df
 
