@@ -27,7 +27,8 @@ from Part1 import stopwords
 from Part1 import stemming
 
 from Part2 import formatting
-
+from Part2 import LogReg
+#from Part2 import padding
 # from Part1 import uniqueWords
 pd.options.mode.chained_assignment = None
 
@@ -36,7 +37,7 @@ sys.path.insert(0,"Part1/")
 sys.path.insert(0,"Part2/")
 
 
-df = pd.read_csv("news_sample.csv")#[:10]
+df = pd.read_csv("news_sample.csv")
 df.drop_duplicates(subset='content', inplace=True,ignore_index=True)
 
 # print(df)
@@ -45,15 +46,11 @@ for x in range(0,len(df)):
     df.iloc[x] = stopwords.removeStopwords(df.iloc[x])
     df.iloc[x] = regexFiltering.keywordFiltering(df.iloc[x])
     df.iloc[x] = stemming.applyStemming(df.iloc[x])
+    pass
 
-df = formatting.generateModel(df)
+formatting.generateModel(fullCorpus=df,loadModel=True,mappingName="newsSampleEncoded").to_csv("articlesEncoded.csv")
+LinearReg.linReg(pd.read_csv("articlesEncoded.csv"))
 
-df.to_csv("Results.csv")
-
-
-
-
-model = formatting.generateModel(df)
-#print(model["Block"])
+#df.to_csv("Results.csv")
 
 
