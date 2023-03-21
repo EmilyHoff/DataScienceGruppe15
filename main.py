@@ -31,15 +31,15 @@ from Part2 import binaryLable
 from Part2 import simpleAuthors
 from Part2 import naiveBayesClassifier
 
+from Part2 import formatting
+from Part2 import LogReg
+#from Part2 import padding
+# from Part1 import uniqueWords
 pd.options.mode.chained_assignment = None
 
 sys.path.insert(0,"Part1/")
 
-df = pd.read_csv("news_sample.csv")#[:10]
-
-#The large dataset
-#df = pd.read_csv("news_cleaned_2018_02_13.csv")
-
+df = pd.read_csv("news_sample.csv")
 df.drop_duplicates(subset='content', inplace=True,ignore_index=True)
 
 #print(df)
@@ -49,6 +49,12 @@ for x in range(0,len(df)):
     df.iloc[x] = stopwords.removeStopwords(df.iloc[x])
     df.iloc[x] = regexFiltering.keywordFiltering(df.iloc[x])
     df.iloc[x] = stemming.applyStemming(df.iloc[x])
+    pass
+
+formatting.generateModel(fullCorpus=df,loadModel=True,mappingName="newsSampleEncoded").to_csv("articlesEncoded.csv")
+LogReg.linReg(pd.read_csv("articlesEncoded.csv"))
+
+#df.to_csv("Results.csv")
 
     #tilføj funktioner husk kun at give en linje
 #dataExploration.fakenessFromWord(df, "bitcoin")
