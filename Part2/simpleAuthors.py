@@ -11,7 +11,7 @@ def numberOfAuthors(df):
         else:
             result = re.findall(r",", df['authors'][x])
             df['authors'][x] = len(result) + 1
-    print(df)
+    # print(df)
     return df
 
 def predictByAuthors(df):
@@ -21,7 +21,7 @@ def predictByAuthors(df):
     x = df['authors'].to_numpy()
     y = df['type'].to_numpy()
 
-    x_train, x_val, y_train, y_val = sk.train_test_split(x, y, test_size=0.2, random_state=0) 
+    x_train, x_val, y_train, y_val = sk.train_test_split(x, y, test_size=0.2, random_state=0)
 
     authorMod = LogisticRegression()
 
@@ -30,7 +30,7 @@ def predictByAuthors(df):
     x_val = np.reshape(x_val, (-1, 1))
     print("shape of x_val: ", x_val.shape)
     print(x_val)
-    
+
     #ensuring correct type within y_data
     y_train = y_train.astype('int')
     y_val = y_val.astype('int')
