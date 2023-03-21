@@ -42,7 +42,7 @@ import pickle
 
 nltk.download('punkt')
 
-def generateModel(fullCorpus=None, loadModel=False,mappingName=None):
+def format(fullCorpus=None, loadModel=False,mappingName=None):
     corpusVocab = None
     fullCorpusEncoded = []
     if not loadModel:
@@ -84,50 +84,7 @@ def generateModel(fullCorpus=None, loadModel=False,mappingName=None):
                 pass
         fullCorpusEncoded.append(article)
         labels.append(fullCorpus["type"][count])
-    return pd.DataFrame(list(zip([x for x in range(0,len(fullCorpus))],fullCorpusEncoded,labels)),columns=["ID","Article encoded","Labels"])
-
-
-
-'''
-def generateModel(fullCorpus=None, loadModel=False):
-    model = None
-    if loadModel:
-        with open("Part2/encoder.pkl", "rb") as f:
-            model = pickle.load(f)
-    else:
-        googleData = api.load("word2vec-google-news-300")
-        
-        
-        if isinstance(fullCorpus, pd.DataFrame):
-            model = Word2Vec(vector_size=300, min_count=5, window=5, sample=1e-3, epochs=10)
-            model.build_vocab(googleData.key_to_index.items())
-            print(f"Length of google vocab: {len(model.wv.key_to_index)}")
-            if model.corpus_count > 0:
-                fullCorpus = fullCorpus.content.apply(lambda x: simple_preprocess(str(x)))
-                model.build_vocab(fullCorpus)
-                model.build_vocab(fullCorpus, update=True, min_count=5)
-                print(f"Length of corpus vocab: {len(model.wv.key_to_index)}")
-                model.train(fullCorpus, total_examples=model.corpus_count, epochs=model.epochs)   
-                   
-        with open("encoder.pkl","wb") as f:
-            pickle.dump(model,f)
-
-    dimReducModel = TSNE(n_components=3,n_jobs=-1).fit_transform(model.wv[model.wv.key_to_index])     
-    keyVec = {list(model.wv.key_to_index.keys())[count]:list(vec) for count,vec in enumerate(dimReducModel)}
-    print(model.wv.key_to_index)
-    id,contentEncoded = [],[]
-    for x in range(0,len(fullCorpus)):
-        content = fullCorpus["content"][x]
-        contentToVec = []
-        for addVec in content.split(" "):
-            try:
-                contentToVec.append(keyVec[addVec])
-            except:
-                contentToVec.append(f"<-----------------------{addVec}---------------------->")
-        id.append(x)
-        contentEncoded.append(contentToVec)
-    return pd.DataFrame(list(zip(id,contentEncoded)),columns=["ID","Content encoded"])
-'''
+    return pd.DataFrame(list(zip(fullCorpusEncoded,labels)),columns=["Article encoded","Labels"])
 
 
 

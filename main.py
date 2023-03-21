@@ -27,17 +27,19 @@ from Part1 import stopwords
 from Part1 import stemming
 
 from Part2 import formatting
-from Part2 import LogReg
+from Part2 import logReg
+from Part2 import BERT
+from Part2 import binaryLable
 #from Part2 import padding
 # from Part1 import uniqueWords
 pd.options.mode.chained_assignment = None
 
 sys.path.insert(0,"Part1/")
+sys.path.insert(0,"Part2/")
 
 df = pd.read_csv("news_sample.csv")
 df.drop_duplicates(subset='content', inplace=True,ignore_index=True)
-
-#print(df)
+df = df[df['type'].apply(lambda x: isinstance(x, str))].drop(columns=['Unnamed: 0']).reset_index(drop=True)
 
 for x in range(0,len(df)):
     df.iloc[x] = zipfsLaw.zipfsFiltering(df.iloc[x])
@@ -46,16 +48,19 @@ for x in range(0,len(df)):
     df.iloc[x] = stemming.applyStemming(df.iloc[x])
     pass
 
-formatting.generateModel(fullCorpus=df,loadModel=True,mappingName="newsSampleEncoded").to_csv("articlesEncoded.csv")
-LogReg.linReg(pd.read_csv("articlesEncoded.csv"))
+df = binaryLable.classifierRelOrFake(df)
+df = BERT.bert(df)
 
-#df.to_csv("Results.csv")
 
-    #tilføj funktioner husk kun at give en linje
-#dataExploration.fakenessFromWord(df, "bitcoin")
-#dataExploration.uniqueGraph(df)
-#dataExploration.exploringData(df)
 
+
+#formatting.format(fullCorpus=df,loadModel=True,mappingName="newsSampleEncoded").to_csv("articlesEncoded.csv")
+#logReg.logReg(pd.read_csv("articlesEncoded.csv"))
+
+
+
+
+'''
 #prepare data for models 
 df = binaryLable.classifierRelOrFake(df)
 
@@ -69,3 +74,5 @@ x_val, x_train, y_val, y_train = sk.train_test_split(x_val, y_val, test_size=0.5
 
 #print(df)
 df.to_csv("Results.csv")
+
+'''
