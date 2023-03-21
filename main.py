@@ -6,7 +6,7 @@ import re
 from collections import defaultdict
 import sklearn.model_selection as sk
 import math
-import re 
+import re
 
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
@@ -18,13 +18,18 @@ nltk.download('stopwords')
 nltk.download('averaged_perceptron_tagger')
 nltk.download("wordnet")
 nltk.download('omw-1.4')
-import sys 
+import sys
 
 from Part1 import regexFiltering
 from Part1 import zipfsLaw
 from Part1 import dataExploration
 from Part1 import stopwords
 from Part1 import stemming
+
+
+from Part2 import binaryLable
+from Part2 import simpleAuthors
+from Part2 import naiveBayesClassifier
 
 from Part2 import formatting
 from Part2 import logReg
@@ -65,8 +70,10 @@ df = BERT.bert(df)
 df = binaryLable.classifierRelOrFake(df)
 
 simpleAuthors.predictByAuthors(df)
+naiveBayesClassifier.naive_bayes_authors(df)
+# naiveBayesClassifier.naive_bayes(df, 'content')
 
-x_test, x_val, y_test, y_val = sk.train_test_split(df['content'], df["type"], test_size=0.2, random_state=0) 
+x_test, x_val, y_test, y_val = sk.train_test_split(df['content'], df["type"], test_size=0.2, random_state=0)
 
 #when working with the large dataset, maybe convert to csv now to avoid recompiling
 

@@ -144,7 +144,6 @@ def exclamationFunction(df):
     for x in range(0, len(df)):
         if str(df['type'][x]).lower() == 'fake':
             k += 1
-            print(df['tags'][x])
         excl = re.findall('!', df['content'][x])
         if len(excl) == 0:
             if str(df['type'][x]).lower() == 'fake':
