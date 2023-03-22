@@ -20,6 +20,7 @@ nltk.download('omw-1.4')
 
 def removeStopwords(df):
     stop_words = set(stopwords.words('english'))
-    tokens = word_tokenize(df["content"])
-    df["content"] = ' '.join([word for word in tokens if not word in stop_words])
+    for y in range(0, len(df)):
+        tokens = word_tokenize(df["content"][y])
+        df["content"][y] = ' '.join([word for word in tokens if not word in stop_words])
     return df

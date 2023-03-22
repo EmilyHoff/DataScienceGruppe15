@@ -19,13 +19,14 @@ nltk.download("wordnet")
 nltk.download('omw-1.4')
 
 def applyStemming(df):
-    tokens = word_tokenize(df["content"])
-    tokenTags = nltk.tag.pos_tag(tokens)
-    ret = []
-    for (x,y) in tokenTags:
-        if "VB" in y:
-            ret.append(PorterStemmer().stem(x))
-        else:
-            ret.append(WordNetLemmatizer().lemmatize(x))
-    df["content"] = ' '.join(ret)
+    for i in range(0, len(df)):
+        tokens = word_tokenize(df["content"][i])
+        tokenTags = nltk.tag.pos_tag(tokens)
+        ret = []
+        for (x,y) in tokenTags:
+            if "VB" in y:
+                ret.append(PorterStemmer().stem(x))
+            else:
+                ret.append(WordNetLemmatizer().lemmatize(x))
+        df["content"][i] = ' '.join(ret)
     return df

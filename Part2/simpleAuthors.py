@@ -3,6 +3,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn import metrics
 import sklearn.model_selection as sk
 import numpy as np
+import pandas as pd
+import Part2.formatting as form
 
 def numberOfAuthors(df):
     for x in range(0, len(df)):
@@ -11,14 +13,17 @@ def numberOfAuthors(df):
         else:
             result = re.findall(r",", df['authors'][x])
             df['authors'][x] = len(result) + 1
-    # print(df)
     return df
 
 def predictByAuthors(df):
     #prepare data
     df = numberOfAuthors(df)
+    df = form.format(df)
 
-    x = df['authors'].to_numpy()
+    x = artEnc.append(df['authors']).to_numpy()
+    print(type(x))
+    print(x.shape)
+    print(x)
     y = df['type'].to_numpy()
 
     x_train, x_val, y_train, y_val = sk.train_test_split(x, y, test_size=0.2, random_state=0)
@@ -36,7 +41,6 @@ def predictByAuthors(df):
     y_val = y_val.astype('int')
     print("shape of y_val: ", y_val.shape)
     print(y_val)
-
 
     authorMod = authorMod.fit(x_train, y_train)
 

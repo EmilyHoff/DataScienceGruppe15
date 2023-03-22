@@ -19,14 +19,14 @@ nltk.download("wordnet")
 nltk.download('omw-1.4')
 
 def zipfsFiltering(df,quantiles=[0.05,0.95],generateGraph=True):
-  #df["content"] = df["content"].lower()
-  for y in ["content"]:
-    tokens = nltk.tokenize.word_tokenize(df[y])
+  for y in range(0, len(df)):
+    df["content"][y] = df["content"][y].lower()
+    tokens = nltk.tokenize.word_tokenize(df["content"][y])
     allWordsDist = nltk.FreqDist(w.lower() for w in tokens)
 
     words = [[word,dict(allWordsDist.most_common())[word]] for word in dict(allWordsDist.most_common()) if word.isalpha()]
     words = sorted(words,key=lambda k: k[1],reverse=True)
-      #print(words)
+    #print(words)
 
     wordCount = [x[1] for x in words]
     lower = int(np.percentile(wordCount,100*(quantiles[0])))
@@ -34,19 +34,11 @@ def zipfsFiltering(df,quantiles=[0.05,0.95],generateGraph=True):
     
     for word in words:
       if word[1] >= upper:
-        df[y] = df[y].replace(f" {word[0]} "," ")
+        df["content"][y] = df["content"][y].replace(f" {word[0]} "," ")
         words.remove(word)
       elif word[1] <= lower:
-        df[y] = df[y].replace(f" {word[0]} "," ")
+        df["content"][y] = df["content"][y].replace(f" {word[0]} "," ")
         words.remove(word)
     
       
-  return df
-
-
-              
-###     
-              
-              
-              
-              
+    return df

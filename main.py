@@ -20,19 +20,15 @@ nltk.download("wordnet")
 nltk.download('omw-1.4')
 import sys
 
-from Part1 import regexFiltering
-from Part1 import zipfsLaw
 from Part1 import dataExploration
-from Part1 import stopwords
-from Part1 import stemming
-
+from Part1 import clean
 
 from Part2 import binaryLable
 from Part2 import simpleAuthors
 from Part2 import naiveBayesClassifier
 
 from Part2 import formatting
-from Part2 import logReg
+#from Part2 import LogReg
 from Part2 import BERT
 from Part2 import binaryLable
 #from Part2 import padding
@@ -42,27 +38,31 @@ pd.options.mode.chained_assignment = None
 sys.path.insert(0,"Part1/")
 sys.path.insert(0,"Part2/")
 
-df = pd.read_csv("news_sample.csv")
-df.drop_duplicates(subset='content', inplace=True,ignore_index=True)
-df = df[df['type'].apply(lambda x: isinstance(x, str))].drop(columns=['Unnamed: 0']).reset_index(drop=True)
+def cleanChunkyDF(filename, chunkSz, iterations):
+    reader = pd.read_csv(filename, iterator=True, chunksize=chunkSz)
+    df = pd.DataFrame()
 
-for x in range(0,len(df)):
-    df.iloc[x] = zipfsLaw.zipfsFiltering(df.iloc[x])
-    df.iloc[x] = stopwords.removeStopwords(df.iloc[x])
-    df.iloc[x] = regexFiltering.keywordFiltering(df.iloc[x])
-    df.iloc[x] = stemming.applyStemming(df.iloc[x])
-    pass
+    while(iterations > 0):
+        for chunk in reader:
+            #removes duplicats and articles without labels
+            chunk.drop_duplicates(subset='content', inplace=True, ignore_index=True)
+            chunk = chunk[chunk['type'].apply(lambda x: isinstance(x, str))].drop(columns=['Unnamed: 0']).reset_index(drop=True)
+            #Cleaning and preprocessing 
+            df = pd.concat([df, clean.cleaning(chunk)])
+            iterations -= 1
+            break
+    return df
+
+#df = cleanChunkyDF("news_cleaned_2018_02_13.csv", 10, 1)
+df = cleanChunkyDF("news_sample.csv", 10, 1)
 
 df = binaryLable.classifierRelOrFake(df)
-df = BERT.bert(df)
+#simpleAuthors.predictByAuthors(df)
 
-
-
+#df = BERT.bert(df)
 
 #formatting.format(fullCorpus=df,loadModel=True,mappingName="newsSampleEncoded").to_csv("articlesEncoded.csv")
 #logReg.logReg(pd.read_csv("articlesEncoded.csv"))
-
-
 
 
 '''
