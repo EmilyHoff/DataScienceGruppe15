@@ -66,7 +66,7 @@ def exploringData(df):
 
     print(f"Prop nouns fake {propNounsFake/fakeTotal} else: {propNounsElse/elseTotal}")
 
-def uniqueGraph(df):
+def uniqueWords(df):
     fakeArticles = []
     reliableArticles = []
 
@@ -101,7 +101,6 @@ def fakenessFromWord(df, word):
 
     word = word.lower()
 
-
     for x in range(0, len(df)):
         result = re.search(rf"\b{word}\b", str(df["content"][x]))
         try:
@@ -118,7 +117,7 @@ def fakenessFromWord(df, word):
         except:
             pass
     print("fakeword: {}\n reliableword: {}\n fakenoword: {} \n reliableNoword: {}".format(fakeWord, reliableWord, fakeNoWord, reliableNoWord))
-    print(df.shape)
+
     #percentage of fake articles with the word out of all fake articles
     preFake = (1 - (fakeNoWord/(fakeNoWord + fakeWord)))*100
     print("Percentage of fake articles with the word: {}%".format(preFake))
@@ -130,7 +129,6 @@ def fakenessFromWord(df, word):
     #out of all articles with the word X% of them are fake
     fakeWordCorrelation = (fakeWord/(fakeWord + reliableWord))*100
     print(fakeWordCorrelation)
-
 
 def exclamationFunction(df):
 

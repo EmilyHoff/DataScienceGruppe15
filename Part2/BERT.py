@@ -3,9 +3,9 @@ import os
 import shutil
 import tensorflow as tf
 import tensorflow_hub as hub
-import tensorflow_text as text
+#import tensorflow_text as text
 import numpy as np
-from official.nlp import optimization
+#from official.nlp import optimization
 
 
 

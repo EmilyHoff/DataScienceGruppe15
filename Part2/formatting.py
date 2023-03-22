@@ -24,7 +24,7 @@ import nltk
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 #from matplotlib import pyplot
 import random
 import pickle
