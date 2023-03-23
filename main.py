@@ -53,10 +53,33 @@ def cleanChunkyDF(filename, chunkSz,size):
 df = cleanChunkyDF("news_sample.csv", 100, 150)
 
 
+simpleAuthors.authorNContent(df)
+
+#formatting.format(fullCorpus=df,loadModel=True,mappingName="newsSampleEncoded").to_csv("articlesEncoded.csv")
+#logReg.logReg(pd.read_csv("articlesEncoded.csv"))
+
+'''
+#prepare data for models 
 df = binaryLable.classifierRelOrFake(df)
+
+simpleAuthors.predictByAuthors(df)
+naiveBayesClassifier.naive_bayes_authors(df)
+# naiveBayesClassifier.naive_bayes(df, 'content')
+
+x_test, x_val, y_test, y_val = sk.train_test_split(df['content'], df["type"], test_size=0.2, random_state=0)
+
+#when working with the large dataset, maybe convert to csv now to avoid recompiling
+
+x_val, x_train, y_val, y_train = sk.train_test_split(x_val, y_val, test_size=0.5, random_state=0)
+
+#print(df)
+df.to_csv("Results.csv")
+
+'''
 print(df)
 
 #df = BERT.bert(df)
 
 #formatting.format(fullCorpus=df,loadModel=True,mappingName="newsSampleEncoded").to_csv("articlesEncoded.csv")
 #logReg.logReg(pd.read_csv("articlesEncoded.csv"))
+
