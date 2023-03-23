@@ -5,10 +5,20 @@ import tensorflow as tf
 import tensorflow_hub as hub
 #import tensorflow_text as text
 import numpy as np
+import wandb 
 #from official.nlp import optimization
 
+#wandb.login()
 
-
+sweep_configuration = {
+    "method":"bayes",
+    "metric":{"goal":"minimize","name":"loss"},
+    "parameters":{
+        "firstAc":{"values":[tf.keras.activations.tanh,tf.keras.activations.sigmoid,tf.keras.activations.relu]},
+        "secondAc":{"values":[tf.keras.activations.tanh,tf.keras.activations.sigmoid,tf.keras.activations.relu]},
+        "secondAc":{"values":[tf.keras.activations.tanh,tf.keras.activations.sigmoid,tf.keras.activations.relu]}
+    }
+}
 
 def bert(df):
     trainX = tf.convert_to_tensor(df["content"][:3*(len(df)//4)-1].values,dtype=tf.string)

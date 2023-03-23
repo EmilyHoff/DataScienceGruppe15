@@ -39,7 +39,10 @@ sys.path.insert(0,"Part1/")
 sys.path.insert(0,"Part2/")
 
 def cleanChunkyDF(filename, chunkSz,size):
-    reader = pd.read_csv(filename, iterator=True, chunksize=chunkSz,nrows=size)
+    if size != None:
+        reader = pd.read_csv(filename, iterator=True, chunksize=chunkSz)
+    else:
+        reader = pd.read_csv(filename, iterator=True, chunksize=chunkSz,nrows=size)
     df = pd.DataFrame()
 
     for chunk in reader:
@@ -49,14 +52,17 @@ def cleanChunkyDF(filename, chunkSz,size):
         #Cleaning and preprocessing 
         df = pd.concat([df, clean.cleaning(chunk)])
     return df
+df = cleanChunkyDF("news_sample.csv", 100,None) #ændre chunk size og antal rækker der skal læses
 
-df = cleanChunkyDF("news_sample.csv", 100, 150)
+print(f"Passing this df {df}")
+print(f"Length of columns: {len(df['content'])} {len(df['type'])}")
 
+dfEncoded = formatting.format(fullCorpus=df,labels=df["type"].tolist(),loadModel=True,mappingName="newsSampleEncoded") #Lav word embedding returner som ny dataframe husk at give labels og 
 
-df = binaryLable.classifierRelOrFake(df)
-print(df)
+# df = binaryLable.classifierRelOrFake(df)
+
 
 #df = BERT.bert(df)
 
-#formatting.format(fullCorpus=df,loadModel=True,mappingName="newsSampleEncoded").to_csv("articlesEncoded.csv")
+
 #logReg.logReg(pd.read_csv("articlesEncoded.csv"))

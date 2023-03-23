@@ -42,9 +42,10 @@ import pickle
 
 nltk.download('punkt')
 
-def format(fullCorpus=None, loadModel=False,mappingName=None):
+def format(fullCorpus=None,labels=None,loadModel=False,mappingName=None):
     corpusVocab = None
     fullCorpusEncoded = []
+    labels = fullCorpus["type"]
     if not loadModel:
         model = api.load("word2vec-google-news-300")  
         fullCorpus = fullCorpus.content.apply(lambda x: simple_preprocess(str(x)))
@@ -72,21 +73,26 @@ def format(fullCorpus=None, loadModel=False,mappingName=None):
         with open(f"Part2/{mappingName}.pickle", "rb") as f:
             corpusVocab = pickle.load(f)
     print(corpusVocab)
-    labels = []
-    for count,li in enumerate(fullCorpus.content):
+    print(fullCorpus)
+    for count,li in enumerate(fullCorpus["content"]):
         article = []
-        print(f"current word {li}")
+        #print(f"current word {li}")
         for x in li.split(" "):
             try:
                 article.append(corpusVocab[x])
             except:
-                print(f"passing with word {x}")
+                #print(f"passing with word {x}")
                 pass
+        print(f"Lenght of fullcorpus: {len(fullCorpus)}")
+        print(f"row: {count}")
         fullCorpusEncoded.append(article)
-        labels.append(fullCorpus["type"][count])
     return pd.DataFrame(list(zip(fullCorpusEncoded,labels)),columns=["Article encoded","Labels"])
 
 
+
+def rows(row):
+    print(f"first line row: {row['Article encoded'][0]}")
+    print(f"first line row: {row[0][1]}")
 
 
 
