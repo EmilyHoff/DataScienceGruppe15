@@ -38,25 +38,21 @@ pd.options.mode.chained_assignment = None
 sys.path.insert(0,"Part1/")
 sys.path.insert(0,"Part2/")
 
-def cleanChunkyDF(filename, chunkSz, iterations):
-    reader = pd.read_csv(filename, iterator=True, chunksize=chunkSz)
+def cleanChunkyDF(filename, chunkSz,size):
+    reader = pd.read_csv(filename, iterator=True, chunksize=chunkSz,nrows=size)
     df = pd.DataFrame()
 
-    while(iterations > 0):
-        for chunk in reader:
-            #removes duplicats and articles without labels
-            chunk.drop_duplicates(subset='content', inplace=True, ignore_index=True)
-            chunk = chunk[chunk['type'].apply(lambda x: isinstance(x, str))].drop(columns=['Unnamed: 0']).reset_index(drop=True)
-            #Cleaning and preprocessing 
-            df = pd.concat([df, clean.cleaning(chunk)])
-            iterations -= 1
-            break
+    for chunk in reader:
+        #removes duplicats and articles without labels
+        chunk.drop_duplicates(subset='content', inplace=True, ignore_index=True)
+        chunk = chunk[chunk['type'].apply(lambda x: isinstance(x, str))].drop(columns=['Unnamed: 0']).reset_index(drop=True)
+        #Cleaning and preprocessing 
+        df = pd.concat([df, clean.cleaning(chunk)])
     return df
 
-#df = cleanChunkyDF("news_cleaned_2018_02_13.csv", 10, 1)
-df = cleanChunkyDF("news_sample.csv", 10, 1)
+df = cleanChunkyDF("news_sample.csv", 100, 150)
 
-df = binaryLable.classifierRelOrFake(df)
+
 simpleAuthors.authorNContent(df)
 
 #formatting.format(fullCorpus=df,loadModel=True,mappingName="newsSampleEncoded").to_csv("articlesEncoded.csv")
@@ -80,3 +76,10 @@ x_val, x_train, y_val, y_train = sk.train_test_split(x_val, y_val, test_size=0.5
 df.to_csv("Results.csv")
 
 '''
+print(df)
+
+#df = BERT.bert(df)
+
+#formatting.format(fullCorpus=df,loadModel=True,mappingName="newsSampleEncoded").to_csv("articlesEncoded.csv")
+#logReg.logReg(pd.read_csv("articlesEncoded.csv"))
+

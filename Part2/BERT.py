@@ -53,27 +53,10 @@ def bert(df):
     
     bertModel = model()
     
-    '''
-    model = tf.keras.Sequential()
-    model.add(tf.keras.layers.Input(shape=(),dtype=tf.string,name="Input layer"))
-    model.add(hub.KerasLayer("https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",name="Preprocessing"))
-    model.add(hub.KerasLayer("https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/3",name="Encoder",trainable=True))
-    model.add(tf.keras.layers.Dropout(0.1))
-    model.add(tf.keras.layers.Dense(16,activation=tf.keras.activations.tanh,name="Dense1"))
-    model.add(tf.keras.layers.Dense(8,activation=tf.keras.activations.tanh,name="Dense2"))
-    model.add(tf.keras.layers.Dense(1,activation=tf.keras.activations.sigmoid,name="Output"))
-    '''
-    
     loss = tf.keras.losses.BinaryCrossentropy(from_logits=True)
     metrics = tf.metrics.BinaryAccuracy()
     
-    epochs = 5
-    #steps_per_epoch = tf.data.experimental.cardinality(X).numpy()
-    #num_train_steps = steps_per_epoch * epochs
-    #num_warmup_steps = int(0.1*num_train_steps)
-    
-    
-    
+    epochs = 5    
     optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
     
     bertModel.compile(optimizer=optimizer,loss=loss,metrics=["accuracy"])
@@ -88,6 +71,5 @@ def bert(df):
     
     print(f"Accuracy: {accuracy}")
     print(f"Loss: {loss}")
-    print(f"Mean: {tf.keras.metrics.Mean()}")
     
     
