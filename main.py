@@ -66,3 +66,4 @@ dfEncoded = formatting.format(fullCorpus=df,labels=df["type"].tolist(),loadModel
 
 
 #logReg.logReg(pd.read_csv("articlesEncoded.csv"))
+
