@@ -39,7 +39,10 @@ sys.path.insert(0,"Part1/")
 sys.path.insert(0,"Part2/")
 
 def cleanChunkyDF(filename, chunkSz,size):
-    reader = pd.read_csv(filename, iterator=True, chunksize=chunkSz,nrows=size)
+    if size != None:
+        reader = pd.read_csv(filename, iterator=True, chunksize=chunkSz)
+    else:
+        reader = pd.read_csv(filename, iterator=True, chunksize=chunkSz,nrows=size)
     df = pd.DataFrame()
 
     for chunk in reader:
@@ -49,37 +52,18 @@ def cleanChunkyDF(filename, chunkSz,size):
         #Cleaning and preprocessing 
         df = pd.concat([df, clean.cleaning(chunk)])
     return df
+df = cleanChunkyDF("news_sample.csv", 100,None) #ændre chunk size og antal rækker der skal læses
 
-df = cleanChunkyDF("news_sample.csv", 100, 150)
+print(f"Passing this df {df}")
+print(f"Length of columns: {len(df['content'])} {len(df['type'])}")
 
+dfEncoded = formatting.format(fullCorpus=df,labels=df["type"].tolist(),loadModel=True,mappingName="newsSampleEncoded") #Lav word embedding returner som ny dataframe husk at give labels og 
 
-simpleAuthors.authorNContent(df)
+# df = binaryLable.classifierRelOrFake(df)
 
-#formatting.format(fullCorpus=df,loadModel=True,mappingName="newsSampleEncoded").to_csv("articlesEncoded.csv")
-#logReg.logReg(pd.read_csv("articlesEncoded.csv"))
-
-'''
-#prepare data for models 
-df = binaryLable.classifierRelOrFake(df)
-
-simpleAuthors.predictByAuthors(df)
-naiveBayesClassifier.naive_bayes_authors(df)
-# naiveBayesClassifier.naive_bayes(df, 'content')
-
-x_test, x_val, y_test, y_val = sk.train_test_split(df['content'], df["type"], test_size=0.2, random_state=0)
-
-#when working with the large dataset, maybe convert to csv now to avoid recompiling
-
-x_val, x_train, y_val, y_train = sk.train_test_split(x_val, y_val, test_size=0.5, random_state=0)
-
-#print(df)
-df.to_csv("Results.csv")
-
-'''
-print(df)
 
 #df = BERT.bert(df)
 
-#formatting.format(fullCorpus=df,loadModel=True,mappingName="newsSampleEncoded").to_csv("articlesEncoded.csv")
+
 #logReg.logReg(pd.read_csv("articlesEncoded.csv"))
 
