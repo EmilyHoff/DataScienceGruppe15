@@ -71,16 +71,16 @@ def format(fullCorpus=None, loadModel=False,mappingName=None):
     else:
         with open(f"Part2/{mappingName}.pickle", "rb") as f:
             corpusVocab = pickle.load(f)
-    print(corpusVocab)
+    #print(corpusVocab)
     labels = []
     for count,li in enumerate(fullCorpus.content):
         article = []
-        print(f"current word {li}")
+        #print(f"current word {li}")
         for x in li.split(" "):
             try:
                 article.append(corpusVocab[x])
             except:
-                print(f"passing with word {x}")
+                #print(f"passing with word {x}")
                 pass
         fullCorpusEncoded.append(article)
         labels.append(fullCorpus["type"][count])

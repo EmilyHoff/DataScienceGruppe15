@@ -57,13 +57,10 @@ def cleanChunkyDF(filename, chunkSz, iterations):
 df = cleanChunkyDF("news_sample.csv", 10, 1)
 
 df = binaryLable.classifierRelOrFake(df)
-#simpleAuthors.predictByAuthors(df)
-
-#df = BERT.bert(df)
+simpleAuthors.authorNContent(df)
 
 #formatting.format(fullCorpus=df,loadModel=True,mappingName="newsSampleEncoded").to_csv("articlesEncoded.csv")
 #logReg.logReg(pd.read_csv("articlesEncoded.csv"))
-
 
 '''
 #prepare data for models 
