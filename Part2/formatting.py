@@ -60,7 +60,7 @@ def format(fullCorpus=None,labels=None,loadModel=False,mappingName=None):
                 pass
         
         corpusWords = [x for x in corpusVocab.values()]
-        dimReducModel = TSNE(n_components=3,n_jobs=-1).fit_transform(np.array(corpusWords)) 
+        dimReducModel = TSNE(n_components=1,n_jobs=-1).fit_transform(np.array(corpusWords)) 
         corpusVocab = {list(corpusVocab.keys())[count]:list(vec) for count,vec in enumerate(dimReducModel)}
         
         if mappingName != None:
@@ -74,25 +74,26 @@ def format(fullCorpus=None,labels=None,loadModel=False,mappingName=None):
             corpusVocab = pickle.load(f)
     print(corpusVocab)
     print(fullCorpus)
-    for count,li in enumerate(fullCorpus["content"]):
+    for count,li in enumerate(fullCorpus.content):
         article = []
-        #print(f"current word {li}")
+        print(f"current word {li}")
         for x in li.split(" "):
             try:
                 article.append(corpusVocab[x])
             except:
-                #print(f"passing with word {x}")
+                print(f"passing with word {x}")
                 pass
-        print(f"Lenght of fullcorpus: {len(fullCorpus)}")
-        print(f"row: {count}")
+        if len(article) == 0:
+            print(f"************************Count: {count} The following article has zero words appended {li}************************")
+        
         fullCorpusEncoded.append(article)
-    return pd.DataFrame(list(zip(fullCorpusEncoded,labels)),columns=["Article encoded","Labels"])
+    return pd.DataFrame(list(zip(fullCorpusEncoded,labels)),columns=["Article encoded","type"])
 
 
 
-def rows(row):
-    print(f"first line row: {row['Article encoded'][0]}")
-    print(f"first line row: {row[0][1]}")
+    
+            
+        
 
 
 

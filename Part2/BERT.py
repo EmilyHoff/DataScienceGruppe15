@@ -7,8 +7,52 @@ import tensorflow_hub as hub
 import numpy as np
 import wandb 
 #from official.nlp import optimization
-
+import tensorflow_text
 #wandb.login()
+
+def threeDrop():
+    input = tf.keras.layers.Input(shape=(),dtype=tf.string,name="Input layer")
+    
+    preprocessing = hub.KerasLayer("https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",name="Preprocessing") #Evt kig på denne, da den truncater artikler til mindre størrelse
+    
+    preprocessedInput = preprocessing(input)
+    
+    encoder = hub.KerasLayer("https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/3",name="Encoder",trainable=True)
+    
+    encodedInput = encoder(preprocessedInput)
+    output = encodedInput["pooled_output"]
+    
+    drop = tf.keras.layers.Dropout(0.1)(output)
+    
+    dense = tf.keras.layers.Dense(16,activation=tf.keras.activations.tanh,name="1")(drop)
+    drop = tf.keras.layers.Dropout(0.1)(dense)
+    dense = tf.keras.layers.Dense(8,activation=tf.keras.activations.tanh,name="2")(drop)
+    drop = tf.keras.layers.Dropout(0.1)(dense)
+    output = tf.keras.layers.Dense(1,activation=tf.keras.activations.sigmoid,name="3")(drop)
+    
+    return tf.keras.Model(input,output)
+
+def oneDrop():
+    input = tf.keras.layers.Input(shape=(),dtype=tf.string,name="Input layer")
+    
+    preprocessing = hub.KerasLayer("https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",name="Preprocessing") #Evt kig på denne, da den truncater artikler til mindre størrelse
+    
+    preprocessedInput = preprocessing(input)
+    
+    encoder = hub.KerasLayer("https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/3",name="Encoder",trainable=True)
+    
+    encodedInput = encoder(preprocessedInput)
+    output = encodedInput["pooled_output"]
+    
+    drop = tf.keras.layers.Dropout(0.1)(output)
+    
+    dense = tf.keras.layers.Dense(16,activation=tf.keras.activations.tanh,name="1")(drop)
+    dense = tf.keras.layers.Dense(8,activation=tf.keras.activations.tanh,name="2")(drop)
+    output = tf.keras.layers.Dense(1,activation=tf.keras.activations.sigmoid,name="3")(drop)
+    
+    return tf.keras.Model(input,output)
+
+modelLi = [threeDrop,oneDrop]
 
 sweep_configuration = {
     "method":"bayes",
@@ -16,7 +60,8 @@ sweep_configuration = {
     "parameters":{
         "firstAc":{"values":[tf.keras.activations.tanh,tf.keras.activations.sigmoid,tf.keras.activations.relu]},
         "secondAc":{"values":[tf.keras.activations.tanh,tf.keras.activations.sigmoid,tf.keras.activations.relu]},
-        "secondAc":{"values":[tf.keras.activations.tanh,tf.keras.activations.sigmoid,tf.keras.activations.relu]}
+        "secondAc":{"values":[tf.keras.activations.tanh,tf.keras.activations.sigmoid,tf.keras.activations.relu]},
+        "modelNumber":{"values":[0,1]}
     }
 }
 
@@ -38,30 +83,7 @@ def bert(df):
     X_batches = np.array_split(trainX, num_batches)
     y_batches = np.array_split(trainY, num_batches)
     
-    
-    def model():
-        input = tf.keras.layers.Input(shape=(),dtype=tf.string,name="Input layer")
-        
-        preprocessing = hub.KerasLayer("https://tfhub.dev/tensorflow/bert_en_uncased_preprocess/3",name="Preprocessing") #Evt kig på denne, da den truncater artikler til mindre størrelse
-        
-        preprocessedInput = preprocessing(input)
-        
-        encoder = hub.KerasLayer("https://tfhub.dev/tensorflow/bert_en_uncased_L-12_H-768_A-12/3",name="Encoder",trainable=True)
-        
-        encodedInput = encoder(preprocessedInput)
-        output = encodedInput["pooled_output"]
-        
-        drop = tf.keras.layers.Dropout(0.1)(output)
-        
-        dense = tf.keras.layers.Dense(16,activation=tf.keras.activations.tanh,name="1")(drop)
-        drop = tf.keras.layers.Dropout(0.1)(dense)
-        dense = tf.keras.layers.Dense(8,activation=tf.keras.activations.tanh,name="2")(drop)
-        drop = tf.keras.layers.Dropout(0.1)(dense)
-        output = tf.keras.layers.Dense(1,activation=tf.keras.activations.sigmoid,name="3")(drop)
-        
-        return tf.keras.Model(input,output)
-    
-    bertModel = model()
+    bertModel = modelLi[1]()
     
     loss = tf.keras.losses.BinaryCrossentropy(from_logits=True)
     metrics = tf.metrics.BinaryAccuracy()
