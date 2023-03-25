@@ -28,9 +28,10 @@ from Part2 import simpleAuthors
 from Part2 import naiveBayesClassifier
 
 from Part2 import formatting
-#from Part2 import LogReg
+from Part2 import LogReg
 from Part2 import BERT
 from Part2 import binaryLable
+from Part2 import SVM
 #from Part2 import padding
 # from Part1 import uniqueWords
 pd.options.mode.chained_assignment = None
@@ -52,18 +53,32 @@ def cleanChunkyDF(filename, chunkSz,size):
         #Cleaning and preprocessing 
         df = pd.concat([df, clean.cleaning(chunk)])
     return df
-df = cleanChunkyDF("news_sample.csv", 100,None) #ændre chunk size og antal rækker der skal læses
 
-print(f"Passing this df {df}")
-print(f"Length of columns: {len(df['content'])} {len(df['type'])}")
 
+df = cleanChunkyDF("news_sample.csv", 30,None) #ændre chunk size og antal rækker der skal læses
+df = binaryLable.classifierRelOrFake(df)
+BERT.bert(df)
+
+df.to_csv("BeforeWordEmbedding.csv")
 dfEncoded = formatting.format(fullCorpus=df,labels=df["type"].tolist(),loadModel=True,mappingName="newsSampleEncoded") #Lav word embedding returner som ny dataframe husk at give labels og 
+    
+#dfEncoded.to_csv("Encoded_articles.csv")
 
-# df = binaryLable.classifierRelOrFake(df)
+LogReg.logReg(dfEncoded)
+
+#SVM.supportVectorMachine(dfEncoded)
 
 
-#df = BERT.bert(df)
 
 
-#logReg.logReg(pd.read_csv("articlesEncoded.csv"))
 
+
+
+def padSequences(X,maxLen):
+    ret = []
+    for x in X:
+        if len(x) < maxLen:
+            while len(x) < maxLen:
+                x.append([0,0,0])
+        ret.append(x)
+    return ret

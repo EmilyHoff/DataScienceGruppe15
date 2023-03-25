@@ -85,7 +85,6 @@ def format(fullCorpus=None,labels=None,loadModel=False,mappingName=None):
                 pass
         if len(article) == 0:
             print(f"************************Count: {count} The following article has zero words appended {li}************************")
-        
         fullCorpusEncoded.append(article)
     return pd.DataFrame(list(zip(fullCorpusEncoded,labels)),columns=["Article encoded","type"])
 
