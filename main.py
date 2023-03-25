@@ -28,10 +28,9 @@ from Part2 import simpleAuthors
 from Part2 import naiveBayesClassifier
 
 from Part2 import formatting
-from Part2 import LogReg
+#from Part2 import LogReg
 from Part2 import BERT
 from Part2 import binaryLable
-from Part2 import SVM
 #from Part2 import padding
 # from Part1 import uniqueWords
 pd.options.mode.chained_assignment = None
@@ -39,8 +38,8 @@ pd.options.mode.chained_assignment = None
 sys.path.insert(0,"Part1/")
 sys.path.insert(0,"Part2/")
 
-def cleanChunkyDF(filename, chunkSz,size):
-    if size != None:
+def cleanChunkyDF(filename, chunkSz, size):
+    if size == None:
         reader = pd.read_csv(filename, iterator=True, chunksize=chunkSz)
     else:
         reader = pd.read_csv(filename, iterator=True, chunksize=chunkSz,nrows=size)
@@ -54,31 +53,17 @@ def cleanChunkyDF(filename, chunkSz,size):
         df = pd.concat([df, clean.cleaning(chunk)])
     return df
 
+df = cleanChunkyDF("news_cleaned_2018_02_13.csv", 10000, 10000) #ændre chunk size og antal rækker der skal læses
 
-df = cleanChunkyDF("news_sample.csv", 30,None) #ændre chunk size og antal rækker der skal læses
+#print(f"Passing this df {df}")
+#print(f"Length of columns: {len(df['content'])} {len(df['type'])}")
+
 df = binaryLable.classifierRelOrFake(df)
-BERT.bert(df)
 
-df.to_csv("BeforeWordEmbedding.csv")
-dfEncoded = formatting.format(fullCorpus=df,labels=df["type"].tolist(),loadModel=True,mappingName="newsSampleEncoded") #Lav word embedding returner som ny dataframe husk at give labels og 
-    
-#dfEncoded.to_csv("Encoded_articles.csv")
+#simpleAuthors.predictByMeta(df)
 
-LogReg.logReg(dfEncoded)
+#dfEncoded = formatting.format(fullCorpus=df,labels=df["type"].tolist(),loadModel=True,mappingName="newsSampleEncoded") #Lav word embedding returner som ny dataframe husk at give labels og 
 
-#SVM.supportVectorMachine(dfEncoded)
+#df = BERT.bert(df)
 
-
-
-
-
-
-
-def padSequences(X,maxLen):
-    ret = []
-    for x in X:
-        if len(x) < maxLen:
-            while len(x) < maxLen:
-                x.append([0,0,0])
-        ret.append(x)
-    return ret
+#logReg.logReg(pd.read_csv("articlesEncoded.csv"))
