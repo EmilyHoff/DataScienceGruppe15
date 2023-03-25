@@ -72,19 +72,19 @@ def format(fullCorpus=None,labels=None,loadModel=False,mappingName=None):
     else:
         with open(f"Part2/{mappingName}.pickle", "rb") as f:
             corpusVocab = pickle.load(f)
-    print(corpusVocab)
-    print(fullCorpus)
-    for count,li in enumerate(fullCorpus.content):
+            
+    fullCorpus = fullCorpus.content.apply(lambda x: simple_preprocess(str(x)))
+    for count,li in enumerate(fullCorpus):
         article = []
         print(f"current word {li}")
-        for x in li.split(" "):
+        for x in li:
             try:
                 article.append(corpusVocab[x])
             except:
                 print(f"passing with word {x}")
                 pass
-        if len(article) == 0:
-            print(f"************************Count: {count} The following article has zero words appended {li}************************")
+        #if len(article) == 0:
+            #print(f"************************Count: {count} The following article has zero words appended {li}************************")
         fullCorpusEncoded.append(article)
     return pd.DataFrame(list(zip(fullCorpusEncoded,labels)),columns=["Article encoded","type"])
 
