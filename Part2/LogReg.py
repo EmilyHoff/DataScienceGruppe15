@@ -1,6 +1,7 @@
 from distutils.ccompiler import new_compiler
 from multiprocessing import reduction
 import sys
+from unittest.util import _MAX_LENGTH
 import pandas as pd
 from traitlets import default
 import numpy as np
@@ -21,35 +22,51 @@ from sklearn.linear_model import LinearRegression
 nltk.download('punkt')
 
 import tensorflow as tf
-from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-from padding import padInput
 
 sys.path.insert(0,"../")
 
+def padSequences(X,maxLen):
+    ret = []
+    for x in X:
+        if len(x) < maxLen:
+            while len(x) < maxLen:
+                x.append([0,0,0])
+        ret.append(x)
+    return ret
+
 def logReg(df):
-    tokenizer = tf.keras.preprocessing.text.Tokenizer(filters='')
-    tokenizer.fit_on_texts(df["Article encoded"])
-    X = tokenizer.texts_to_sequences(df["Article encoded"])
-    labels = np.where(df["Labels"]=="fake", 1, 0)
-    reg = LogisticRegression(random_state=0).fit(X[:100], labels[:100])
+    max_len = max([len(seq) for seq in df["Article encoded"]])
+    max_len = 250
+    padded_list = [seq + [0.0] * (max_len - len(seq)) for seq in df["Article encoded"]]
+    padded_list = [x[:max_len] for x in padded_list]
+    X = []
+    
+    for li in padded_list:
+        oneInput = []
+        for x in li:
+            if isinstance(x,list):
+                oneInput.append(x[0])
+            else:
+                oneInput.append(x)
+        X.append(oneInput)
+    
+    X = np.array(X)
+    X = X.reshape((X.shape[0], -1))
+    
+    print(f"length of lists = {set([len(x) for x in X])}")
+    print(f"input with zeros: {X}")
+    
+    y = np.array(df["type"])
+    
+    reg = LogisticRegression(random_state=0).fit(X[:50],y[:50])
+    
     print(f"len of padded articles is {len(X)}")
     count = 0
-    
-    y_pred = []
-    y_true = []
-    
-    for x in range(139):
-        y_pred.append(reg.predict(X[100+x].reshape(1,-1)))
-        y_true.append(labels[100+x])
-        print(f"Prediction: {reg.predict(X[100+x].reshape(1,-1))} Label: {labels[100+x]}")
-        if reg.predict(X[100+x].reshape(1,-1))[0] == labels[100+x]:
-            count +=1
-        else:
-            count = count-1
-            
-    
-    print(f"Correct-Wrong: {count}")
-    print(classification_report(y_true,y_pred))
+    print(f"single {len(reg.predict(X[:50]))}")
+    y_pred = reg.predict(np.array(X[50:]))
+        
+    print(classification_report(y[50:],y_pred))
