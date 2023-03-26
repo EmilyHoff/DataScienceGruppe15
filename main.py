@@ -29,10 +29,9 @@ from Part2 import naiveBayesClassifier
 
 from Part2 import formatting
 #from Part2 import LogReg
-from Part2 import BERT
+#from Part2 import BERT
 from Part2 import binaryLable
 #from Part2 import padding
-# from Part1 import uniqueWords
 pd.options.mode.chained_assignment = None
 
 sys.path.insert(0,"Part1/")
@@ -50,15 +49,25 @@ def cleanChunkyDF(filename, chunkSz, size):
         chunk.drop_duplicates(subset='content', inplace=True, ignore_index=True)
         chunk = chunk[chunk['type'].apply(lambda x: isinstance(x, str))].drop(columns=['Unnamed: 0']).reset_index(drop=True)
         #Cleaning and preprocessing 
-        df = pd.concat([df, clean.cleaning(chunk)])
+        df = pd.concat([df, clean.cleaning(chunk)], ignore_index=True)
     return df
 
-df = cleanChunkyDF("news_cleaned_2018_02_13.csv", 10000, 10000) #ændre chunk size og antal rækker der skal læses
+df = cleanChunkyDF("news_cleaned_2018_02_13.csv", 1000, 10000) #ændre chunk size og antal rækker der skal læses
 
-#print(f"Passing this df {df}")
-#print(f"Length of columns: {len(df['content'])} {len(df['type'])}")
+print(f"Passing this df {df}")
+print(f"Length of columns: {len(df['content'])} {len(df['type'])}")
 
 df = binaryLable.classifierRelOrFake(df)
+simpleAuthors.predictByAuthors(df)
+simpleAuthors.predictByMeta(df)
+
+#Data Exploration
+'''dataExploration.exploringData(df)
+dataExploration.uniqueWords(df)
+dataExploration.fakenessFromWord(df, "bitcoin")
+exclamationDf = pd.read_csv("news_cleaned_2018_02_13.csv", nrows=10000)
+exclamationDf = binaryLable.classifierRelOrFake(exclamationDf)
+dataExploration.exclamationFunction(exclamationDf)'''
 
 #simpleAuthors.predictByMeta(df)
 

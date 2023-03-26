@@ -15,7 +15,6 @@ pd.options.mode.chained_assignment = None
 nltk.download('punkt')
 nltk.download('stopwords')
 
-
 def exploringData(df):
     propNounsFake = 0
     fakeTotal = 0
@@ -23,46 +22,37 @@ def exploringData(df):
     propNounsElse = 0
     elseTotal = 0
 
+    #allows us to compare
+    types = df['type'].tolist()
 
-    for y in ["content"]:
-        for x in range(0,len(df)):
-            try:
-                if df["type"][x].lower() == "fake":
-                    fakeTotal +=1
-                    sentences = sent_tokenize(df[y][x])
-                    words = [word_tokenize(sentence.lower()) for sentence in sentences]
-                    words = words[0]
-                    print(words)
+    for x in range(0,len(df)):
+        if types[x] == 0:
+            fakeTotal +=1
+            sentences = sent_tokenize(str(df['content'][x]))
+            words = [word_tokenize(sentence.lower()) for sentence in sentences]
+            words = words[0]
 
-                    tagged_words = [nltk.pos_tag(sentence) for sentence in words]
-                    print(f"tags: {tagged_words}")
-                    proper_nouns = []
-                    for sentence in tagged_words:
-                        for word, tag in sentence:
-                            if tag == 'NNP': # NNP denotes proper noun
-                                proper_nouns.append(word)
-                    print(proper_nouns)
-                    propNounsFake += len(set(proper_nouns))
+            tagged_words = [nltk.pos_tag(words)]
+            proper_nouns = []
+            for sentence in tagged_words:
+                for word, tag in sentence:
+                    if tag == 'NNP': # NNP denotes proper noun
+                        proper_nouns.append(word)
+            propNounsFake += len(set(proper_nouns))
 
+        else:
+            elseTotal +=1
+            sentences = sent_tokenize(str(df['content'][x]))
+            words = [word_tokenize(sentence.lower()) for sentence in sentences]
+            words = words[0]
 
-                else:
-                    elseTotal +=1
-                    sentences = sent_tokenize(df[y][x])
-                    words = [word_tokenize(sentence.lower()) for sentence in sentences]
-                    words = words[0]
-                    print(words)
-
-                    tagged_words = [nltk.pos_tag(sentence) for sentence in words]
-                    print(f"tags: {tagged_words}")
-                    proper_nouns = []
-                    for sentence in tagged_words:
-                        for word, tag in sentence:
-                            if tag == 'NNP': # NNP denotes proper noun
-                                proper_nouns.append(word)
-                    print(proper_nouns)
-                    propNounsElse += len(set(proper_nouns))
-            except:
-                pass
+            tagged_words = [nltk.pos_tag(words)]
+            proper_nouns = []
+            for sentence in tagged_words:
+                for word, tag in sentence:
+                    if tag == 'NNP': # NNP denotes proper noun
+                        proper_nouns.append(word)
+            propNounsElse += len(set(proper_nouns))
 
     print(f"Prop nouns fake {propNounsFake/fakeTotal} else: {propNounsElse/elseTotal}")
 
@@ -73,9 +63,10 @@ def uniqueWords(df):
     fakeWords = []
     reliableWords = []
 
-    #for y in df["content"]:
+    types = df['type'].tolist()
+
     for x in range(0, len(df)):
-        if df["type"][x].lower() == "fake":
+        if types[x] == 0:
             fakeWords = Counter(sorted(word_tokenize(df["content"][x])))
             fakeArticles.append(len(fakeWords))
         else:
@@ -100,23 +91,24 @@ def fakenessFromWord(df, word):
     reliableNoWord = 0
 
     word = word.lower()
+    types = df['type'].tolist()
 
     for x in range(0, len(df)):
         result = re.search(rf"\b{word}\b", str(df["content"][x]))
         try:
             if not(result == None): #the word is found
-                if df["type"][x].lower() == "fake":
+                if types[x] == 0:
                     fakeWord += 1
                 else:
                     reliableWord += 1
             else:
-                if df["type"][x].lower() == "fake":
+                if types[x] == 0:
                     fakeNoWord += 1
                 else:
                     reliableNoWord += 1
         except:
             pass
-    print("fakeword: {}\n reliableword: {}\n fakenoword: {} \n reliableNoword: {}".format(fakeWord, reliableWord, fakeNoWord, reliableNoWord))
+    print("fakeWord: {}\n reliableWord: {}\n fakeNoWord: {} \n reliableNoWord: {}".format(fakeWord, reliableWord, fakeNoWord, reliableNoWord))
 
     #percentage of fake articles with the word out of all fake articles
     preFake = (1 - (fakeNoWord/(fakeNoWord + fakeWord)))*100
@@ -128,7 +120,7 @@ def fakenessFromWord(df, word):
 
     #out of all articles with the word X% of them are fake
     fakeWordCorrelation = (fakeWord/(fakeWord + reliableWord))*100
-    print(fakeWordCorrelation)
+    print("Precentage of fake articles from alle articles with the word: ", fakeWordCorrelation)
 
 def exclamationFunction(df):
 
@@ -137,53 +129,49 @@ def exclamationFunction(df):
 
     fakeNoExclamations = 0
     nonFakeNoExclamations = 0
-    k = 0
+
+    types = df['type'].tolist()
+    fakeArticles = types.count(1)
 
     for x in range(0, len(df)):
-        if str(df['type'][x]).lower() == 'fake':
-            k += 1
         excl = re.findall('!', df['content'][x])
-        if len(excl) == 0:
-            if str(df['type'][x]).lower() == 'fake':
+        if bool(excl) == False: #the list is empty
+            if types[x] == 0:
                 fakeNoExclamations += 1
             else:
                 nonFakeNoExclamations += 1
         else:
-            if str(df['type'][x]).lower() == 'fake':
+            if types[x] == 0:
                 fakeExclamations.append(len(excl))
             else:
                 nonFakeExclamations.append(len(excl))
 
-
     fakeExclMean = stats.mean(fakeExclamations)
     nonFakeExclMean = stats.mean(nonFakeExclamations)
 
-    fNE = (fakeNoExclamations / k)*100
+    fNE = (fakeNoExclamations / fakeArticles)*100
 
     print("If the article is fake and has exclamation marks, there are on average {} of them".format(fakeExclMean))
     print("If the article isn't fake, and has exclamation marks, there are on average {} of them".format(nonFakeExclMean))
 
-    print("Of the {} total articles, {} of them are fake".format(len(df), k))
-    print("Of the {} fake articles, {} don't have exclamation marks in - {}%".format(k, fakeNoExclamations, fNE))
+    print("Of the {} total articles, {} of them are fake".format(len(df), fakeArticles))
+    print("Of the {} fake articles, {} don't have exclamation marks in - {}%".format(fakeArticles, fakeNoExclamations, fNE))
 
     # 155/250 articles are fake = 62% of them
     # of 155 articles, 84.5% of them have exclamation
-    ifFake = ((k/len(df)) * (len(fakeExclamations)/k)) / (
-                (k/len(df)) * (len(fakeExclamations)/k) + (
-                (1 - (k/len(df))) * (1 - (len(fakeExclamations)/k)))) * 100
-
+    #ifFake = ((fakeArticles/len(df)) * (len(fakeExclamations)/fakeArticles)) / (
+    #            (fakeArticles/len(df)) * (len(fakeExclamations)/fakeArticles) + (
+    #            (1 - (fakeArticles/len(df))) * (1 - (len(fakeExclamations)/fakeArticles)))) * 100
+    ifFake = (fakeArticles-len(fakeExclamations))/fakeArticles
     # remaining 38% of articles, not fake
     # 18.9% of these have exclamation marks
-    ifNonFake = (((len(df) - k)/len(df)) * (len(nonFakeExclamations)/(len(df) - k))) / (
-                (((len(df) - k)/len(df)) * (len(nonFakeExclamations)/(len(df) - k))) + (
-                (1 - ((len(df) - k)/len(df))) * (1 - (
-                len(nonFakeExclamations)/(len(df) - k))))) * 100
+    #ifNonFake = (((len(df) - fakeArticles)/len(df)) * (len(nonFakeExclamations)/(len(df) - fakeArticles))) / (
+    #            (((len(df) - fakeArticles)/len(df)) * (len(nonFakeExclamations)/(len(df) - fakeArticles))) + (
+    #            (1 - ((len(df) - fakeArticles)/len(df))) * (1 - (
+    #            len(nonFakeExclamations)/(len(df) - fakeArticles))))) * 100
+    ifNonFake = ((len(df) - fakeArticles) - len(nonFakeExclamations))/(len(df) - fakeArticles)
 
     print("If an article is fake, there is a {}% chance of them have exclamation marks".format(ifFake))
     print("If an article isn't fake, there is a {}% chance that it has exclamation marks".format(ifNonFake))
-
-
-df = pd.read_csv('news_sample.csv')
-exclamationFunction(df)
 
 

@@ -39,12 +39,12 @@ def predictByAuthors(df):
     authorMod = authorMod.fit(x_train, y_train)
 
     y_pred = authorMod.predict(x_val)
-    y_pred = y_val.astype('int')
+    y_val = y_val.astype('int')
 
     print("Accuracy: ", metrics.accuracy_score(y_val, y_pred))
-    print("Recall: ", metrics.recall_score(y_val, y_pred))
-    print("Precision: ", metrics.recall_score(y_val, y_pred))
-    print("F1-score: ", metrics.f1_score(y_val, y_pred))
+    print("Recall: ", metrics.recall_score(y_val, y_pred, average='weighted', zero_division=1))
+    print("Precision: ", metrics.recall_score(y_val, y_pred, average='weighted', zero_division=1))
+    print("F1-score: ", metrics.f1_score(y_val, y_pred, average='weighted', zero_division=1))
 
     return
 
@@ -106,10 +106,10 @@ def predictByMeta(df):
     metaMod = metaMod.fit(x_train, y_train)
 
     y_pred = metaMod.predict(x_val)
-    y_pred = y_val.astype('int')
+    y_val = y_val.astype('int')
 
     print("Accuracy: ", metrics.accuracy_score(y_val, y_pred))
-    print("Recall: ", metrics.recall_score(y_val, y_pred))
-    print("Precision: ", metrics.recall_score(y_val, y_pred))
-    print("F1-score: ", metrics.f1_score(y_val, y_pred))
+    print("Recall: ", metrics.recall_score(y_val, y_pred, average='weighted', zero_division=1))
+    print("Precision: ", metrics.recall_score(y_val, y_pred, average='weighted', zero_division=1))
+    print("F1-score: ", metrics.f1_score(y_val, y_pred, average='weighted', zero_division=1))
     return
