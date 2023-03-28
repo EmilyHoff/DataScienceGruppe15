@@ -41,7 +41,7 @@ pd.options.mode.chained_assignment = None
 sys.path.insert(0,"Part1/")
 sys.path.insert(0,"Part2/")
 
-def cleanChunkyDF(filename, chunkSz, size):
+'''def cleanChunkyDF(filename, chunkSz, size):
     if size == None:
         reader = pd.read_csv(filename, iterator=True, chunksize=chunkSz)
     else:
@@ -54,16 +54,45 @@ def cleanChunkyDF(filename, chunkSz, size):
         chunk = chunk[chunk['type'].apply(lambda x: isinstance(x, str))].drop(columns=['Unnamed: 0']).reset_index(drop=True)
         #Cleaning and preprocessing
         df = pd.concat([df, clean.cleaning(chunk)], ignore_index=True)
+    return df'''
+
+def cleanChunkyDF(filename, chunkSz, size, sep):
+    if sep == None:
+        reader = pd.read_csv(filename, iterator=True, chunksize=chunkSz)
+    else:
+        reader = pd.read_csv(filename, iterator=True, chunksize=chunkSz,nrows=size, sep=sep)
+
+    df = pd.DataFrame()
+
+    for chunk in reader:
+        if sep == None:
+            #removes duplicats and articles without labels
+            chunk.drop_duplicates(subset='content', inplace=True, ignore_index=True)
+            chunk = chunk[chunk['type'].apply(lambda x: isinstance(x, str))].drop(columns=['Unnamed: 0']).reset_index(drop=True)
+            #Cleaning and preprocessing
+            df = pd.concat([df, clean.cleaning(chunk)], ignore_index=True)
+        else: #for LAIR tsv file case
+            chunk.columns = ['ID', 'type', 'content', 'subjecs', 'speaker',
+                            'job of speaker', 'state', 'party affiliation', 'barely true counts',
+                            'false counts', 'half true counts', 'mostly true counts',
+                            'pants on fire', 'context']
+            #removes duplicats
+            chunk.drop_duplicates(subset=['content'], inplace=True, ignore_index=True)
+            #Cleaning and preprocessing
+            df = pd.concat([df, clean.cleaning(chunk)], ignore_index=True)
+
     return df
 
-# df = cleanChunkyDF("news_sample.csv", 30, 250) #ændre chunk size og antal rækker der skal læses
-df = pd.read_csv('news_sample.csv')
+#df = cleanChunkyDF("news_cleaned_2018_02_13.csv", 1000, 10000) #ændre chunk size og antal rækker der skal læses
+
+df = cleanChunkyDF("train.tsv", 1, 10, '\t')
+
 print(f"Passing this df {df}")
 print(f"Length of columns: {len(df['content'])} {len(df['type'])}")
 
-df = binaryLable.classifierRelOrFake(df)
-simpleAuthors.predictByAuthors(df)
-simpleAuthors.predictByMeta(df)
+#df = binaryLable.classifierRelOrFake(df)
+#simpleAuthors.predictByAuthors(df)
+#simpleAuthors.predictByMeta(df)
 
 
 #Data Exploration
