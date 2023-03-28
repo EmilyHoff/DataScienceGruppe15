@@ -82,9 +82,11 @@ def domianReliability(df):
     domainScore = pd.DataFrame(domainScore, columns=['domainScore'])
     return pd.DataFrame(domainScore, columns=['domainScore'])
 
-'''A baseline model for prediction of an articles authencity base on 
-the domain which published it and the number of authors'''
+
 def predictByMeta(df):
+    '''A baseline model for prediction of an articles authencity base on
+    the domain which published it and the number of authors'''
+
     #prepare data
     authorsDF = numberOfAuthors(df)['authors'].to_frame()
     authorsDF = authorsDF.reset_index()

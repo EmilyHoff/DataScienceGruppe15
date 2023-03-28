@@ -60,7 +60,7 @@ def format(fullCorpus=None,labels=None,loadModel=False,mappingName=None):
                 pass
 
         corpusWords = [x for x in corpusVocab.values()]
-        dimReducModel = TSNE(n_components=1,n_jobs=-1).fit_transform(np.array(corpusWords)) 
+        dimReducModel = TSNE(n_components=1,n_jobs=-1).fit_transform(np.array(corpusWords))
         corpusVocab = {list(corpusVocab.keys())[count]:list(vec) for count,vec in enumerate(dimReducModel)}
 
         if mappingName != None:
@@ -72,8 +72,8 @@ def format(fullCorpus=None,labels=None,loadModel=False,mappingName=None):
     else:
         with open(f"Part2/{mappingName}.pickle", "rb") as f:
             corpusVocab = pickle.load(f)
-            
-    fullCorpus = fullCorpus.content.apply(lambda x: simple_preprocess(str(x)))
+        fullCorpus = fullCorpus.content.apply(lambda x: simple_preprocess(str(x)))
+
     for count,li in enumerate(fullCorpus):
         article = []
         print(f"current word {li}")
@@ -90,9 +90,9 @@ def format(fullCorpus=None,labels=None,loadModel=False,mappingName=None):
 
 
 
-    
-            
-        
+
+
+
 
 
 
