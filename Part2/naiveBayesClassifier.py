@@ -68,7 +68,7 @@ def naive_bayes_authors(df):
     print('bern f1 score:', bernnb_f1_score)
     return
 
-def naive_bayes_content(df, config):
+def naive_bayes_content(df):
 
     print('nb model')
 

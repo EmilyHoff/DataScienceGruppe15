@@ -111,7 +111,7 @@ def oneHotEncode(df):
             vector[word_to_index[word]] = 1
         one_hot_vectors.append(vector)
 
-    enc = OneHotEncoder(dtype=int)
+    enc = OneHotEncoder()
 
     transformed = enc.fit_transform(one_hot_vectors)
     encoded = np.array(transformed.toarray())
