@@ -26,11 +26,11 @@ from Part1 import clean
 from Part2 import binaryLable
 from Part2 import simpleAuthors
 from Part2 import naiveBayesClassifier
+from Part2 import baselineModels
 
 from Part2 import formatting
 #from Part2 import LogReg
 #from Part2 import BERT
-from Part2 import binaryLable
 #from Part2 import padding
 pd.options.mode.chained_assignment = None
 
@@ -39,7 +39,7 @@ sys.path.insert(0,"Part2/")
 
 def cleanChunkyDF(filename, chunkSz, nrows, sep):
     #if sep== none you're parsing a .csv file
-    #if you wish to read a .tsv file sep='\t' 
+    #if you wish to read a .tsv file sep='\t'
     if sep == None:
         if nrows == None:
             reader = pd.read_csv(filename, iterator=True, chunksize=chunkSz)
@@ -58,7 +58,7 @@ def cleanChunkyDF(filename, chunkSz, nrows, sep):
             #removes duplicats and articles without labels
             chunk.drop_duplicates(subset='content', inplace=True, ignore_index=True)
             chunk = chunk[chunk['type'].apply(lambda x: isinstance(x, str))].drop(columns=['Unnamed: 0']).reset_index(drop=True)
-            #Cleaning and preprocessing 
+            #Cleaning and preprocessing
             df = pd.concat([df, clean.cleaning(chunk)], ignore_index=True)
         else: #for LAIR tsv file case
             chunk.columns = ['ID', 'type', 'content', 'subjecs', 'speaker',
@@ -67,7 +67,7 @@ def cleanChunkyDF(filename, chunkSz, nrows, sep):
                             'pants on fire', 'context']
             #removes duplicats
             chunk.drop_duplicates(subset=['content'], inplace=True, ignore_index=True)
-            #Cleaning and preprocessing 
+            #Cleaning and preprocessing
             df = pd.concat([df, clean.cleaning(chunk)], ignore_index=True)
 
     return df
@@ -79,6 +79,7 @@ print(f"Length of columns: {len(trainDf['content'])} {len(trainDf['type'])}")
 
 tDf = binaryLable.classifierRelOrFake(trainDf)
 vDf = binaryLable.classifierRelOrFake(valDf)
+
 #simpleAuthors.predictByAuthors(tDf, vDf)
 #simpleAuthors.predictByMeta(df)
 
@@ -90,8 +91,11 @@ exclamationDf = pd.read_csv("news_cleaned_2018_02_13.csv", nrows=10000)
 exclamationDf = binaryLable.classifierRelOrFake(exclamationDf)
 dataExploration.exclamationFunction(exclamationDf)'''
 
-#dfEncoded = formatting.format(fullCorpus=df,labels=df["type"].tolist(),loadModel=True,mappingName="newsSampleEncoded") #Lav word embedding returner som ny dataframe husk at give labels og 
+#dfEncoded = formatting.format(fullCorpus=df,labels=df["type"].tolist(),loadModel=True,mappingName="newsSampleEncoded") #Lav word embedding returner som ny dataframe husk at give labels og
 
+# tDf = formatting.oneHotEncode(tDf)
+# vDf = formatting.oneHotEncode(vDf)
+# baselineModels.perceptronClassifier(tDf)
 #df = BERT.bert(df)
 
 #logReg.logReg(pd.read_csv("articlesEncoded.csv"))

@@ -97,19 +97,10 @@ def naive_bayes_content(df):
     print(newX.shape)
     label = df['type']
 
-    # print('train test split')
-    acc = []
-    pres = []
-    rec = []
-    f1 = []
-    # for i in range(0, 50):
     X_train, X_val, y_train, y_val = train_test_split(newX, label, test_size=0.2, random_state=0)
 
     y_train = y_train.astype('int')
     y_val = y_val.astype('int')
-
-    print(y_train.shape)
-    print(y_val.shape)
 
     nb = ComplementNB()
     nb.fit(X_train, y_train)
@@ -129,15 +120,11 @@ def naive_bayes_content(df):
     conf_matr = metr.confusion_matrix(y_val, y_pred)
     class_report = metr.classification_report(y_val, y_pred, zero_division=1)
 
-    # nb_acc = max(acc, key=itemgetter(1))[0]
-    # precision = max(pres, key=itemgetter(1))[0]
-    # recall = max(rec, key=itemgetter(1))[0]
-    # f1_score = max(f1, key=itemgetter(1))[0]
 
-    print('accuracy:{:0.5f}'.format(nb_acc)) # 0.65
-    print('precision:{:0.5f}'.format(precision)) # 0.685
-    print('recall:{:0.5f}'.format(recall)) # 0.65
-    print('f1-score:{:0.5f}'.format(f1_score)) # 0.664
+    print('accuracy:{:0.5f}'.format(nb_acc)) 
+    print('precision:{:0.5f}'.format(precision))
+    print('recall:{:0.5f}'.format(recall))
+    print('f1-score:{:0.5f}'.format(f1_score))
 
     print('confusion matrix:\n', conf_matr,'\n')
     print('report:\n', class_report)

@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 from collections import Counter
 from cleantext import clean
 import re
-import nltk 
+import nltk
 import numpy as np
 
-#NB! does only handel one chunk at the time 
+#NB! does only handel one chunk at the time
 
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
@@ -32,13 +32,14 @@ def cleaningGraph(df):
 
     for i in range(0, len(df)):
         df['content'][i] = clean(df['content'][i],
-                                lower=True, 
+                                lower=True,
                                 no_emails=True,
                                 no_urls=True,
                                 no_numbers=True,
                                 no_punct=True,
                                 normalize_whitespace=True,
                                 replace_with_email="<EMAIL>",
+                                replace_with_punct=' ',
                                 replace_with_url="<URL>",
                                 replace_with_number="<NUM>")
     words.append(countWords(df))
@@ -54,7 +55,7 @@ def cleaning(df):
     #cleaning
     for i in range(0, len(df)):
         df['content'][i] = clean(df['content'][i],
-                                lower=True, 
+                                lower=True,
                                 no_emails=True,
                                 no_urls=True,
                                 no_numbers=True,
@@ -63,7 +64,7 @@ def cleaning(df):
                                 replace_with_email="<EMAIL>",
                                 replace_with_url="<URL>",
                                 replace_with_number="<NUM>")
-    
+
     #stopwords removal
     stop_words = set(stopwords.words('english'))
     for y in range(0, len(df)):
