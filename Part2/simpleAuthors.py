@@ -5,6 +5,7 @@ import sklearn.model_selection as sk
 import numpy as np
 import pandas as pd
 from collections import Counter
+import matplotlib.pyplot as plt
 
 
 def numberOfAuthors(df):
@@ -17,14 +18,16 @@ def numberOfAuthors(df):
             df['authors'][x] = len(result) + 1
     return df
 
-def predictByAuthors(df):
+def predictByAuthors(trainDf, valDf):
     #prepare data
-    df = numberOfAuthors(df)
+    trainDf = numberOfAuthors(trainDf)
+    valDF = numberOfAuthors(valDf)
 
-    x = df['authors'].to_numpy()
-    y = df['type'].to_numpy()
+    x_train = trainDf['authors'].to_numpy()
+    y_train = trainDf['type'].to_numpy()
 
-    x_train, x_val, y_train, y_val = sk.train_test_split(x, y, test_size=0.2, random_state=0)
+    x_val = valDf['authors'].to_numpy()
+    y_val = valDf['type'].to_numpy()
 
     authorMod = LogisticRegression()
 
@@ -45,6 +48,13 @@ def predictByAuthors(df):
     print("Recall: ", metrics.recall_score(y_val, y_pred, average='weighted', zero_division=1))
     print("Precision: ", metrics.recall_score(y_val, y_pred, average='weighted', zero_division=1))
     print("F1-score: ", metrics.f1_score(y_val, y_pred, average='weighted', zero_division=1))
+
+    #confusion matrix
+    confusionMatrix = metrics.confusion_matrix(y_val, y_pred, normalize='all')
+    cmTable = metrics.ConfusionMatrixDisplay(confusion_matrix=confusionMatrix,
+                                             display_labels=[False, True])
+    cmTable.plot()
+    plt.show()
 
     return
 
@@ -82,11 +92,9 @@ def domianReliability(df):
     domainScore = pd.DataFrame(domainScore, columns=['domainScore'])
     return pd.DataFrame(domainScore, columns=['domainScore'])
 
-
+'''A baseline model for prediction of an articles authencity base on 
+the domain which published it and the number of authors'''
 def predictByMeta(df):
-    '''A baseline model for prediction of an articles authencity base on
-    the domain which published it and the number of authors'''
-
     #prepare data
     authorsDF = numberOfAuthors(df)['authors'].to_frame()
     authorsDF = authorsDF.reset_index()
