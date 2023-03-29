@@ -72,30 +72,22 @@ def cleanChunkyDF(filename, chunkSz, nrows, sep):
 
     return df
 
-trainDf = pd.read_csv('train.csv')
-valDf = pd.read_csv('val.csv')
-#print(f"Passing this df {df}")
-print(f"Length of columns: {len(trainDf['content'])} {len(trainDf['type'])}")
+train = cleanChunkyDF("20k.csv", 1000,2000,None) #ændre chunk size og antal rækker der skal læses
+test = cleanChunkyDF("train.tsv", 100,1000,"\t")
 
-tDf = binaryLable.classifierRelOrFake(trainDf)
-vDf = binaryLable.classifierRelOrFake(valDf)
+print(f"The set of labels in train: {set(train['type'])}")
+print(f"The set of labels in test: {set(test['type'])}")
 
-#simpleAuthors.predictByAuthors(tDf, vDf)
-#simpleAuthors.predictByMeta(df)
 
-#Data Exploration
-'''dataExploration.exploringData(df)
-dataExploration.uniqueWords(df)
-dataExploration.fakenessFromWord(df, "bitcoin")
-exclamationDf = pd.read_csv("news_cleaned_2018_02_13.csv", nrows=10000)
-exclamationDf = binaryLable.classifierRelOrFake(exclamationDf)
-dataExploration.exclamationFunction(exclamationDf)'''
+train = binaryLable.classifierRelOrFake(train)
+test = binaryLable.classifierRelOrFake(test)
 
-#dfEncoded = formatting.format(fullCorpus=df,labels=df["type"].tolist(),loadModel=True,mappingName="newsSampleEncoded") #Lav word embedding returner som ny dataframe husk at give labels og
+print(f"Imbalance in train {sum(train['type'].tolist())/len(train['type'].tolist())}")
+print(f"This is imbalance in test {sum(test['type'].tolist())/len(test['type'].tolist())}")
 
-# tDf = formatting.oneHotEncode(tDf)
-# vDf = formatting.oneHotEncode(vDf)
-# baselineModels.perceptronClassifier(tDf)
-#df = BERT.bert(df)
+df,split = binaryLable.combine(train,test)
 
-#logReg.logReg(pd.read_csv("articlesEncoded.csv"))
+df = df.drop(columns=[col for col in df.columns if col not in ['type', 'content']])
+
+encoded,embedding_matrix,vocab_size = formatting.format(df)
+advModels.bert(encoded,embedding_matrix,df['type'].tolist(),vocab_size,split)
