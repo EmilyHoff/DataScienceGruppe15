@@ -6,12 +6,11 @@ from tkinter import E
 import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
-import tensorflow_text
 import sys
 from sklearn.metrics import accuracy_score
-from tensorflow.keras.models import Sequential
-import fasttext
-from tensorflow.keras import metrics
+#from tensorflow.keras.models import Sequential
+#import fasttext
+#from tensorflow.keras import metrics
 import matplotlib.pyplot as plt
 
 from imblearn.over_sampling import SMOTE
@@ -29,7 +28,7 @@ import wandb
 
 #df = None
 
-from transformers import pipeline
+#from transformers import pipeline
 import os
 
 def bert(encoded,embedding_matrix,labels,vocab_size,split):
@@ -155,6 +154,7 @@ def ensemble(encoded,labels,split):
     
     y_pred = clf.predict(testX)
     print(f"This is the ensemble method: {classification_report(testY,y_pred)}")
+    return y_pred
 
 
 

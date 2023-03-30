@@ -26,6 +26,7 @@ from Part1 import clean
 from Part2 import binaryLable
 from Part2 import naiveBayesClassifier
 from Part2 import simpleModels
+from Part2 import advModels
 
 from Part2 import formatting
 #from Part2 import LogReg
@@ -77,8 +78,8 @@ def cleanChunkyDF(filename, chunkSz, nrows, sep):
 #print(f"The set of labels in test: {set(test['type'])}")
 
 
-train = pd.read_csv("train.csv")[:30000]
-val = pd.read_csv("val.csv")[:3000]
+train = pd.read_csv("train.csv")[:300]
+val = pd.read_csv("val.csv")[:30]
 
 train = binaryLable.classifierRelOrFake(train)
 val = binaryLable.classifierRelOrFake(val)
@@ -90,8 +91,9 @@ encoded, labels = formatting.bow(df)
 y_predA = simpleModels.predictByAuthors(train, val)
 y_predLog = simpleModels.bow_logreg(encoded, labels, split)
 y_predPer = simpleModels.bow_perceptron(encoded, labels, split)
+y_predEns = advModels.ensemble(encoded, labels, split)
 
-simpleModels.ROCcurve(y_predA, y_predLog, y_predPer, val)
+simpleModels.ROCcurve(y_predA, y_predLog, y_predPer, y_predEns, val)
 
 '''print(f"Imbalance in train {sum(train['type'].tolist())/len(train['type'].tolist())}")
 print(f"This is imbalance in test {sum(test['type'].tolist())/len(test['type'].tolist())}")
