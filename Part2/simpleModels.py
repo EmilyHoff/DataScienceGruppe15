@@ -138,7 +138,7 @@ def predictByAuthors(trainDf, valDf):
 
     return y_pred
 
-def ROCcurve(y_predA, y_predLog, y_predPer, valDf):
+def ROCcurve(y_predA, y_predLog, y_predPer, y_predEns, valDf):
     #prepare data
     y_val = valDf['type'].to_numpy()
     y_val = y_val.astype('int')
@@ -158,7 +158,12 @@ def ROCcurve(y_predA, y_predLog, y_predPer, valDf):
     aucPer = metrics.roc_auc_score(y_val, y_predPer)
     plt.plot(fpr, tpr, label="Perceptron auc= " + str(aucPer))
 
+    #auc on ensemble
+    fpr, tpr, _ = metrics.roc_curve(y_val,  y_predEns)
+    aucEns = metrics.roc_auc_score(y_val, y_predEns)
+    plt.plot(fpr, tpr, label="Perceptron auc= " + str(aucEns))
+
     plt.legend(loc=4)
-    plt.title("ROC-curves - simple models")
+    plt.title("ROC-curves")
     plt.show()
     return
