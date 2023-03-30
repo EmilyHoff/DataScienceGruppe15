@@ -26,11 +26,9 @@ from Part1 import clean
 from Part2 import binaryLable
 from Part2 import simpleAuthors
 from Part2 import naiveBayesClassifier
-from Part2 import baselineModels
 
 from Part2 import formatting
 #from Part2 import LogReg
-#from Part2 import BERT
 #from Part2 import padding
 pd.options.mode.chained_assignment = None
 
@@ -72,7 +70,7 @@ def cleanChunkyDF(filename, chunkSz, nrows, sep):
 
     return df
 
-train = cleanChunkyDF("20k.csv", 1000,2000,None) #ændre chunk size og antal rækker der skal læses
+train = cleanChunkyDF("train.csv", 1000,2000,None) #ændre chunk size og antal rækker der skal læses
 test = cleanChunkyDF("train.tsv", 100,1000,"\t")
 
 print(f"The set of labels in train: {set(train['type'])}")
