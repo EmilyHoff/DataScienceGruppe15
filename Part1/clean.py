@@ -9,8 +9,6 @@ import re
 import nltk
 import numpy as np
 
-#NB! does only handel one chunk at the time
-
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
@@ -24,7 +22,7 @@ def countWords(df):
         words += ((df['content'][y]).split())
     return len(Counter(words))
 
-def cleaningGraph(df):
+def cleanGraph(df):
     words = []
     words.append(countWords(df))
     df = stop.removeStopwords(df)
@@ -32,14 +30,13 @@ def cleaningGraph(df):
 
     for i in range(0, len(df)):
         df['content'][i] = clean(df['content'][i],
-                                lower=True,
+                                lower=True, 
                                 no_emails=True,
                                 no_urls=True,
                                 no_numbers=True,
                                 no_punct=True,
                                 normalize_whitespace=True,
                                 replace_with_email="<EMAIL>",
-                                replace_with_punct=' ',
                                 replace_with_url="<URL>",
                                 replace_with_number="<NUM>")
     words.append(countWords(df))
@@ -49,13 +46,31 @@ def cleaningGraph(df):
     plt.xlabel("Cleaning Step")
     plt.ylabel("Unique Words")
     plt.show()
-    return df
+    return
+
+def thoroughCleanGraph(df):
+    words = []
+    words.append(countWords(df))
+    df = zip.zipfsFiltering(df)
+    words.append(countWords(df))
+    df = stop.removeStopwords(df)
+    words.append(countWords(df))
+    df = regex.keywordFiltering(df)
+    words.append(countWords(df))
+    df = stem.applyStemming(df)
+    
+    #plot the effect of the cleaning
+    plt.bar(['Raw','Stopwords', 'Filtering'], words)
+    plt.xlabel("Cleaning Step")
+    plt.ylabel("Unique Words")
+    plt.show()
+    return 
 
 def cleaning(df):
     #cleaning
     for i in range(0, len(df)):
         df['content'][i] = clean(df['content'][i],
-                                lower=True,
+                                lower=True, 
                                 no_emails=True,
                                 no_urls=True,
                                 no_numbers=True,
@@ -64,10 +79,12 @@ def cleaning(df):
                                 replace_with_email="<EMAIL>",
                                 replace_with_url="<URL>",
                                 replace_with_number="<NUM>")
-
+    
     #stopwords removal
     stop_words = set(stopwords.words('english'))
     for y in range(0, len(df)):
         tokens = word_tokenize(df["content"][y])
         df["content"][y] = ' '.join([word for word in tokens if not word in stop_words])
     return df
+    
+    
