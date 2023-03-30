@@ -27,7 +27,7 @@ from Part2 import binaryLable
 from Part2 import simpleAuthors
 from Part2 import naiveBayesClassifier
 
-from Part2 import formatting
+#from Part2 import formatting
 #from Part2 import LogReg
 #from Part2 import padding
 pd.options.mode.chained_assignment = None
@@ -70,17 +70,19 @@ def cleanChunkyDF(filename, chunkSz, nrows, sep):
 
     return df
 
-train = cleanChunkyDF("train.csv", 1000,2000,None) #ændre chunk size og antal rækker der skal læses
-test = cleanChunkyDF("train.tsv", 100,1000,"\t")
+train = cleanChunkyDF("train.csv", 1000, 2000,None) #ændre chunk size og antal rækker der skal læses
+test = cleanChunkyDF("val.csv", 100, 1000, None)
 
-print(f"The set of labels in train: {set(train['type'])}")
-print(f"The set of labels in test: {set(test['type'])}")
+#print(f"The set of labels in train: {set(train['type'])}")
+#print(f"The set of labels in test: {set(test['type'])}")
 
 
 train = binaryLable.classifierRelOrFake(train)
 test = binaryLable.classifierRelOrFake(test)
 
-print(f"Imbalance in train {sum(train['type'].tolist())/len(train['type'].tolist())}")
+simpleAuthors.predictByAuthors(train, test)
+
+'''print(f"Imbalance in train {sum(train['type'].tolist())/len(train['type'].tolist())}")
 print(f"This is imbalance in test {sum(test['type'].tolist())/len(test['type'].tolist())}")
 
 df,split = binaryLable.combine(train,test)
@@ -88,4 +90,4 @@ df,split = binaryLable.combine(train,test)
 df = df.drop(columns=[col for col in df.columns if col not in ['type', 'content']])
 
 encoded,embedding_matrix,vocab_size = formatting.format(df)
-advModels.bert(encoded,embedding_matrix,df['type'].tolist(),vocab_size,split)
+advModels.bert(encoded,embedding_matrix,df['type'].tolist(),vocab_size,split)'''
