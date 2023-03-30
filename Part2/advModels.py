@@ -106,3 +106,51 @@ def bert(encoded,embedding_matrix,labels,vocab_size,split):
     
     return loss,accuracy
 
+def ensemble(encoded,labels,split):
+    
+    trainX = np.array(encoded[:split])
+    trainY = np.array(labels[:split])
+    
+    scaler = StandardScaler(with_mean=False)
+    X_train_scaled = scaler.fit_transform(trainX)
+    
+    smote = SMOTE()
+    trainX,trainY = smote.fit_resample(X_train_scaled,trainY)
+
+
+    testX = np.array(encoded[split:])
+    testY = np.array(labels[split:])
+        
+    #clf = BaggingClassifier(base_estimator=LogisticRegression(random_state=0,max_iter=15,solver="newton-cg"),
+    #                        n_estimators=25,
+    #                        random_state=0).fit(trainX,trainY)
+    
+    
+    #clf = BaggingClassifier(base_estimator=svm.SVC(),
+    #                       n_estimators=15,
+    #                       random_state=0,verbose=1).fit(trainX,trainY)
+    
+    #clf = BaggingClassifier(base_estimator=KMeans(n_clusters=2, n_init="auto"),
+    #                        n_estimators=25,
+    #                        random_state=0).fit(trainX,trainY)
+    
+    
+    #clf = RandomForestClassifier(n_estimators=25,class_weight="balanced").fit(trainX,trainY)
+    
+    #clf = ExtraTreesClassifier(n_estimators=250, max_depth=5,
+    #                           min_samples_split=2, random_state=0,
+    #                           verbose=4).fit(trainX,trainY)
+    
+    clf = AdaBoostClassifier(base_estimator=LogisticRegression(random_state=0,max_iter=15,solver="newton-cg"),
+                             n_estimators=300).fit(trainX,trainY)
+    
+    y_pred = clf.predict(testX)
+    print(f"This is the ensemble method: {classification_report(testY,y_pred)}")
+
+
+
+
+
+
+
+
