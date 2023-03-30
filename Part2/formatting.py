@@ -35,7 +35,7 @@ import tensorflow as tf
 import random
 import pickle
 
-import fasttext
+#import fasttext
 
 nltk.download('punkt')
 
@@ -83,7 +83,6 @@ def format(fullCorpus=None):
     return encoded,embedding_matrix,len(model.words)
 
 
-
 def bow(df):
     # Extract the article content and labels
     articles = df['content'].tolist()
@@ -93,13 +92,13 @@ def bow(df):
     vectorizer = CountVectorizer(analyzer="char_wb")
 
     # Fit the vectorizer on the articles to learn the vocabulary
-    vectorizer.fit(articles)
+    #vectorizer.fit(articles)
     
     # Transform the articles into bag-of-words vectors
-    encoded_articles = vectorizer.transform(articles)
+    encoded_articles = vectorizer.fit_transform(articles)
     encoded_articles = encoded_articles.toarray().tolist()
 
-    return encoded_articles,labels
+    return encoded_articles, labels
     
 
 

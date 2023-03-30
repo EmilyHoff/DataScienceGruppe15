@@ -24,10 +24,10 @@ from Part1 import dataExploration
 from Part1 import clean
 
 from Part2 import binaryLable
-from Part2 import simpleAuthors
 from Part2 import naiveBayesClassifier
+from Part2 import simpleModels
 
-#from Part2 import formatting
+from Part2 import formatting
 #from Part2 import LogReg
 #from Part2 import padding
 pd.options.mode.chained_assignment = None
@@ -70,17 +70,28 @@ def cleanChunkyDF(filename, chunkSz, nrows, sep):
 
     return df
 
-train = cleanChunkyDF("train.csv", 1000, 2000,None) #ændre chunk size og antal rækker der skal læses
-test = cleanChunkyDF("val.csv", 100, 1000, None)
+#train = cleanChunkyDF("train.csv", 1000, 2000,None) #ændre chunk size og antal rækker der skal læses
+#test = cleanChunkyDF("val.csv", 100, 1000, None)
 
 #print(f"The set of labels in train: {set(train['type'])}")
 #print(f"The set of labels in test: {set(test['type'])}")
 
 
-train = binaryLable.classifierRelOrFake(train)
-test = binaryLable.classifierRelOrFake(test)
+train = pd.read_csv("train.csv")[:30000]
+val = pd.read_csv("val.csv")[:3000]
 
-simpleAuthors.predictByAuthors(train, test)
+train = binaryLable.classifierRelOrFake(train)
+val = binaryLable.classifierRelOrFake(val)
+
+df, split = binaryLable.combine(train, val)
+
+encoded, labels = formatting.bow(df)
+
+y_predA = simpleModels.predictByAuthors(train, val)
+y_predLog = simpleModels.bow_logreg(encoded, labels, split)
+y_predPer = simpleModels.bow_perceptron(encoded, labels, split)
+
+simpleModels.ROCcurve(y_predA, y_predLog, y_predPer, val)
 
 '''print(f"Imbalance in train {sum(train['type'].tolist())/len(train['type'].tolist())}")
 print(f"This is imbalance in test {sum(test['type'].tolist())/len(test['type'].tolist())}")
