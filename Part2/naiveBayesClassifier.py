@@ -73,6 +73,7 @@ def bow_perceptron(encoded, labels, split):
     print(class_report)
     # display_confMatr.plot()
     # plt.show()
+    return y_pred
 
 def bow_logreg(encoded, labels, split):
 
@@ -101,4 +102,6 @@ def bow_logreg(encoded, labels, split):
     print('logreg f1-score: {:0.5f}'.format(f1_score))
     print('logreg confusion matrix:\n', conf_matr,'\n')
     print(class_report)
+
+    return y_pred
 
