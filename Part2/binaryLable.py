@@ -1,9 +1,9 @@
 import pandas as pd
 
 def classifierRelOrFake(df):
-    #prepare data
+    '''Converts the types of the articles into binary labels'''
     labels = df['type'].astype('string').tolist()
-    trueLabels = ['reliable', 'clickbait', 'political', 'true', 'mostly true']
+    trueLabels = ['reliable', 'true', 'mostly-true']
     for x in range(0, len(df)):
         if (labels[x] in trueLabels) :
             df['type'][x] = 1
@@ -12,5 +12,6 @@ def classifierRelOrFake(df):
     return df
 
 def combine(first, second):
+    '''Combines two DataFrames'''
     combined = pd.concat([first,second],ignore_index=True)
     return combined, combined.index[first.shape[0]]

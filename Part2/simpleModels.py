@@ -4,29 +4,24 @@ from multiprocessing.dummy import active_children
 import os
 import shutil
 from tkinter import E
-import tensorflow as tf
-import tensorflow_hub as hub
 import numpy as np
-#import tensorflow_text
 import sys
-from sklearn.metrics import accuracy_score
-'''from tensorflow.keras.models import Sequential
-import fasttext
-from tensorflow.keras import metrics'''
+import pandas as pd
+
 from sklearn.linear_model import LogisticRegression
 from sklearn import metrics
-from sklearn.metrics import roc_curve
 import sklearn.model_selection as sk
 import numpy as np
-import matplotlib.pyplot as plt
 import re
 
 from sklearn.linear_model import Perceptron
 from sklearn.linear_model import LogisticRegression
 
-from sklearn.preprocessing import StandardScaler
 
 def bow_perceptron(encoded, labels, split):
+    '''Perceptron model, a basline model for binary classification of fake news.
+    Only trained on the content of the article, the content is encoded using the
+    bag-of-words scheme'''
 
     articles = np.array(encoded)
     labels = np.array(labels)
@@ -54,11 +49,13 @@ def bow_perceptron(encoded, labels, split):
     print('percep recall: {:0.5f}'.format(recall))
     print('percep f1-score: {:0.5f}'.format(f1_score))
     print(class_report)
-    # display_confMatr.plot()
-    # plt.show()
-    return y_pred
+    
+    return y_pred, percep
 
 def bow_logreg(encoded, labels, split):
+    '''A logistical regression model for binary classification of fake news
+    A baseline, only trained on the content of the article, the content is 
+    encoded using the bag-of-words scheme'''
 
     articles = np.array(encoded)
     labels = np.array(labels)
@@ -86,84 +83,43 @@ def bow_logreg(encoded, labels, split):
     print('logreg confusion matrix:\n', conf_matr,'\n')
     print(class_report)
 
-    return y_pred
+    return y_pred, logreg
 
 def numberOfAuthors(df):
+    '''Drops the current authors column and replaces it with a new column containing the
+    number of authers credited for the publication'''
     authors = df['authors'].tolist()
     for x in range(0, len(df)):
-        if type(authors[x]) == float:
-            df['authors'][x] = 0
+        nanRes = len(re.findall(r"nan\b", str(authors[x])))
+        if nanRes == 0: #there are authors
+            result = len(re.findall(r",", str(authors[x]))) 
+            authors[x] = result + 1
         else:
-            result = re.findall(r",", str(authors[x]))
-            df['authors'][x] = len(result) + 1
-    return df
+            authors[x] = 0
+    return pd.DataFrame(authors, columns=['authors'])
 
-def predictByAuthors(trainDf, valDf):
-    #prepare data
-    trainDf = numberOfAuthors(trainDf)
-    valDF = numberOfAuthors(valDf)
+def predictByAuthors(df, labels, split):
+    '''A logistical baseline model that predicts the label of an article only based on
+    the number of authers who wrote it'''
+    df = numberOfAuthors(df)
 
-    x_train = trainDf['authors'].to_numpy()
-    y_train = trainDf['type'].to_numpy()
+    authors = np.array(df)
+    labels = np.array(labels)
 
-    x_val = valDf['authors'].to_numpy()
-    y_val = valDf['type'].to_numpy()
+    x_train = authors[:split]
+    y_train = labels[:split]
+    x_val = authors[split:]
+    y_val =labels[split:]
 
     authorMod = LogisticRegression()
-
-    #reshaping x_data
-    x_train = np.reshape(x_train, (-1, 1))
-    x_val = np.reshape(x_val, (-1, 1))
-
-    #ensuring correct type within y_data
-    y_train = y_train.astype('int')
-    y_val = y_val.astype('int')
 
     authorMod = authorMod.fit(x_train, y_train)
 
     y_pred = authorMod.predict(x_val)
-    y_val = y_val.astype('int')
 
     print("Accuracy: ", metrics.accuracy_score(y_val, y_pred))
     print("Recall: ", metrics.recall_score(y_val, y_pred, average='weighted', zero_division=1))
     print("Precision: ", metrics.recall_score(y_val, y_pred, average='weighted', zero_division=1))
     print("F1-score: ", metrics.f1_score(y_val, y_pred, average='weighted', zero_division=1))
 
-    #confusion matrix
-    confusionMatrix = metrics.confusion_matrix(y_val, y_pred, normalize='all')
-    cmTable = metrics.ConfusionMatrixDisplay(confusion_matrix=confusionMatrix,
-                                             display_labels=[False, True])
-    cmTable.plot()
-    plt.show()
-
-    return y_pred
-
-def ROCcurve(y_predA, y_predLog, y_predPer, y_predEns, valDf):
-    #prepare data
-    y_val = valDf['type'].to_numpy()
-    y_val = y_val.astype('int')
-
-    #auc on author model
-    fpr, tpr, _ = metrics.roc_curve(y_val,  y_predA)
-    aucA = metrics.roc_auc_score(y_val, y_predA)
-    plt.plot(fpr, tpr, label="Author auc= " + str(aucA))
-
-    #auc on logMod
-    fpr, tpr, _ = metrics.roc_curve(y_val,  y_predLog)
-    aucLog = metrics.roc_auc_score(y_val, y_predLog)
-    plt.plot(fpr, tpr, label="LogMod auc= " + str(aucLog))
-
-    #auc on perceptron
-    fpr, tpr, _ = metrics.roc_curve(y_val,  y_predPer)
-    aucPer = metrics.roc_auc_score(y_val, y_predPer)
-    plt.plot(fpr, tpr, label="Perceptron auc= " + str(aucPer))
-
-    #auc on ensemble
-    fpr, tpr, _ = metrics.roc_curve(y_val,  y_predEns)
-    aucEns = metrics.roc_auc_score(y_val, y_predEns)
-    plt.plot(fpr, tpr, label="Perceptron auc= " + str(aucEns))
-
-    plt.legend(loc=4)
-    plt.title("ROC-curves")
-    plt.show()
-    return
+    return y_pred, authorMod
