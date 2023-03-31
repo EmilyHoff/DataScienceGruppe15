@@ -31,88 +31,54 @@ import wandb
 #from transformers import pipeline
 import os
 
-def bert(encoded,embedding_matrix,labels,vocab_size,split):
+def LSTM(encoded,labels,split,vocab_size=None,embedding_matrix=None):
 
-    trainX = tf.convert_to_tensor(encoded[:split],dtype=tf.float32)
-    trainY = tf.convert_to_tensor(labels[:split])
+    trainX = tf.convert_to_tensor(encoded,dtype=tf.float32)
+    trainY = tf.convert_to_tensor(labels)
     
     testX = tf.convert_to_tensor(encoded[split:],dtype=tf.float32)
     testY = tf.convert_to_tensor(labels[split:])    
     
     print(f"Lenght of train: {trainX}")
     print(f"Length of train y: {trainY}")
-    
-    
-    
+
     batch_size = 32
-    
-    print()
-    
-    #RNN
-    
+
     bertModel = Sequential()
-    bertModel.add(tf.keras.layers.Embedding(vocab_size+1,150,weights=[embedding_matrix]))
-    bertModel.add(tf.keras.layers.LSTM(32))
-    bertModel.add(tf.keras.layers.GaussianDropout(0.3))
-    bertModel.add(tf.keras.layers.Reshape((2,16)))
-    bertModel.add(tf.keras.layers.LSTM(16))
+    bertModel.add(tf.keras.layers.Dense(128, activation="relu"))
+    bertModel.add(tf.keras.layers.Reshape((2,64)))
     bertModel.add(tf.keras.layers.GaussianDropout(0.2))
-    bertModel.add(tf.keras.layers.Reshape((2,8)))
+    bertModel.add(tf.keras.layers.LSTM(128, activation="tanh"))
+    bertModel.add(tf.keras.layers.GaussianDropout(0.2))
+    bertModel.add(tf.keras.layers.Reshape((2*64,)))
+    bertModel.add(tf.keras.layers.Dense(16, activation='relu'))
+    bertModel.add(tf.keras.layers.Reshape((2, 8)))
     bertModel.add(tf.keras.layers.LSTM(8))
-    bertModel.add(tf.keras.layers.Dense(1,activation="sigmoid"))
-    '''
-    
-    #Proven to work
-    bertModel = Sequential()
-    bertModel.add(tf.keras.layers.Embedding(vocab_size+1,150,weights=[embedding_matrix]))
-    bertModel.add(tf.keras.layers.Dense(32))
-    bertModel.add(tf.keras.layers.Dropout(0.3))
-    bertModel.add(tf.keras.layers.Dense(16))
-    bertModel.add(tf.keras.layers.Dense(1))
-    
-    #Dense
-    
-    bertModel = Sequential()
-    bertModel.add(tf.keras.layers.Embedding(vocab_size+1,150,weights=[embedding_matrix]))
-    bertModel.add(tf.keras.layers.Dense(32))
-    bertModel.add(tf.keras.layers.GaussianDropout(0.2))
-    bertModel.add(tf.keras.layers.Dense(16))
-    bertModel.add(tf.keras.layers.GaussianDropout(0.2))
-    bertModel.add(tf.keras.layers.Dense(8))
-    bertModel.add(tf.keras.layers.Dense(1,activation="sigmoid"))
-    '''
-    
+    bertModel.add(tf.keras.layers.Dense(1, activation="sigmoid",
+                                        bias_initializer=tf.keras.initializers.Constant(np.log([sum(labels)/len(labels)]))))
+
     METRICS = [
-      metrics.TruePositives(name='tp'),
-      metrics.FalsePositives(name='fp'),
-      metrics.TrueNegatives(name='tn'),
-      metrics.FalseNegatives(name='fn'), 
-      metrics.BinaryAccuracy(name='accuracy'),
-      metrics.Precision(name='precision'),
-      metrics.Recall(name='recall'),
-      metrics.AUC(name='auc'),
-      metrics.AUC(name='prc', curve='PR'), # precision-recall curve
+      tf.keras.metrics.TruePositives(name='tp'),
+      tf.keras.metrics.FalsePositives(name='fp'),
+      tf.keras.metrics.TrueNegatives(name='tn'),
+      tf.keras.metrics.FalseNegatives(name='fn'), 
+      tf.keras.metrics.BinaryAccuracy(name='accuracy'),
+      tf.keras.metrics.Precision(name='precision'),
+      tf.keras.metrics.Recall(name='recall'),
+      tf.keras.metrics.AUC(name='auc'),
+      tf.keras.metrics.AUC(name='prc', curve='PR') # precision-recall curve,
     ]
     
-    bertModel.compile(optimizer='adam',loss='binary_crossentropy',metrics=[METRICS])
-    
+    bertModel.compile(optimizer='adam',loss='binary_crossentropy',metrics=METRICS)
     
     for i in range(len(trainX) // batch_size):
         print(f"batch: {i}")
         x_batch = trainX[i*batch_size:(i+1)*batch_size]
         y_batch = trainY[i*batch_size:(i+1)*batch_size]
-        bertModel.fit(x_batch, y_batch)
+        bertModel.fit(x_batch, y_batch,class_weight={0:1,1:1})
         
-    print(bertModel.predict(testX))
-    loss, accuracy,auc,precision,recall = bertModel.evaluate(testX,testY)
-    
-    print(f"Loss: {loss}")
-    print(f"Accuracy: {accuracy}")
-    print(f"AUC: {auc}")
-    print(f"Precision: {precision}")
-    print(f"Recall: {recall}")
-    
-    return loss,accuracy
+    metric = bertModel.evaluate(testX,testY)
+    return metric
 
 def ensemble(encoded,labels,split):
     
