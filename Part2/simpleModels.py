@@ -17,6 +17,41 @@ import re
 from sklearn.linear_model import Perceptron
 from sklearn.linear_model import LogisticRegression
 
+
+def bow_perceptron(encoded, labels, split):
+    '''Perceptron model, a basline model for binary classification of fake news.
+    Only trained on the content of the article, the content is encoded using the
+    bag-of-words scheme'''
+
+    articles = np.array(encoded)
+    labels = np.array(labels)
+
+    X_train = articles[:split]
+    y_train = labels[:split]
+    X_val = articles[split:]
+    y_val = labels[split:]
+
+    percep = Perceptron()
+    percep.fit(X_train, y_train)
+    y_pred = percep.predict(X_val)
+
+    accuracy = metrics.accuracy_score(y_val, y_pred)
+    precision = metrics.precision_score(y_val, y_pred, zero_division=1,average='weighted')
+    recall = metrics.recall_score(y_val, y_pred, zero_division=1,average='weighted')
+    f1_score = metrics.f1_score(y_val, y_pred, zero_division=1, average='weighted')
+    conf_matr = metrics.confusion_matrix(y_val, y_pred)
+    display_confMatr = metrics.ConfusionMatrixDisplay(confusion_matrix=conf_matr,
+                                                      display_labels=[False, True])
+    class_report = metrics.classification_report(y_val, y_pred, zero_division=1)
+
+    print('percep accuracy: {:0.5f}'.format(accuracy))
+    print('percep precision: {:0.5f}'.format(precision))
+    print('percep recall: {:0.5f}'.format(recall))
+    print('percep f1-score: {:0.5f}'.format(f1_score))
+    print(class_report)
+    
+    return y_pred, percep
+
 def bow_logreg(encoded, labels, split):
     '''A logistical regression model for binary classification of fake news
     A baseline, only trained on the content of the article, the content is 
@@ -34,17 +69,9 @@ def bow_logreg(encoded, labels, split):
     logreg.fit(X_train, y_train)
     y_pred = logreg.predict(X_val)
 
-    accuracy = metrics.accuracy_score(y_val, y_pred)
-    precision = metrics.precision_score(y_val, y_pred, zero_division=1,average='weighted')
-    recall = metrics.recall_score(y_val, y_pred, zero_division=1,average='weighted')
-    f1_score = metrics.f1_score(y_val, y_pred, zero_division=1, average='weighted')
     conf_matr = metrics.confusion_matrix(y_val, y_pred)
     class_report = metrics.classification_report(y_val, y_pred, zero_division=1)
 
-    print('logreg accuracy: {:0.5f}'.format(accuracy))
-    print('logreg precision: {:0.5f}'.format(precision))
-    print('logreg recall: {:0.5f}'.format(recall))
-    print('logreg f1-score: {:0.5f}'.format(f1_score))
     print('logreg confusion matrix:\n', conf_matr,'\n')
     print(class_report)
 
@@ -82,9 +109,10 @@ def predictByAuthors(df, labels, split):
 
     y_pred = authorMod.predict(x_val)
 
-    print("Accuracy: ", metrics.accuracy_score(y_val, y_pred))
-    print("Recall: ", metrics.recall_score(y_val, y_pred, average='weighted', zero_division=1))
-    print("Precision: ", metrics.recall_score(y_val, y_pred, average='weighted', zero_division=1))
-    print("F1-score: ", metrics.f1_score(y_val, y_pred, average='weighted', zero_division=1))
+    conf_matr = metrics.confusion_matrix(y_val, y_pred)
+    class_report = metrics.classification_report(y_val, y_pred, zero_division=1)
+
+    print('predictByAuthors confusion matrix:\n', conf_matr,'\n')
+    print(class_report)
 
     return y_pred, authorMod
