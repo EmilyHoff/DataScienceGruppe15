@@ -17,6 +17,7 @@ def cleaning(df):
                                 no_urls=True,
                                 no_numbers=True,
                                 no_punct=True,
+                                no_emoji=True,
                                 normalize_whitespace=True,
                                 replace_with_email="<EMAIL>",
                                 replace_with_url="<URL>",
