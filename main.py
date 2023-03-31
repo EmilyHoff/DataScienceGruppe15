@@ -48,60 +48,9 @@ dataExploration.plot_words(explorDf, splitsEx, model='logreg')'''
 #cleaning graphs
 '''graphs.cleanGraph(pd.read_csv("news_cleaned_2018_02_13.csv", nrows=10000))
 graphs.thoroughCleanGraph(pd.read_csv("news_cleaned_2018_02_13.csv", nrows=10000))'''
-'''
-#cleaning the data and relabeling
+
+#load fakenews corpus
 df = clean.cleanChunkyDF("news_cleaned_2018_02_13.csv", 1000, 100000, None)
-df = binaryLable.classifierRelOrFake(df)
-
-#split data
-train, val = sk.train_test_split(df, test_size=0.2, random_state=47)
-val, test = sk.train_test_split(val, test_size=0.5, random_state=47)
-
-#prepare data for training 
-trainVal, split = binaryLable.combine(train, val)
-encoded, labels = formatting.bow(trainVal)
-
-#train models and make predictions on validation data
-y_predA, authorMod = simpleModels.predictByAuthors(trainVal, labels, split)
-y_predLog, logMod = simpleModels.bow_logreg(encoded, labels, split)
-y_predPer, perMod = simpleModels.bow_perceptron(encoded, labels, split)
-y_predNB, nb = naiveBayesClassifier.naive_bayes_content(encoded, labels, split)
-
-
-#produce the confusionmetric 
-#graphs.confusionMetric(labels, split, y_predA, "Confusion Matrix - Predict by authors")
-
-#Evaluation part - test on LAIR and test data
-liarDf = clean.cleanChunkyDF('train.tsv', 1000, 10000)
-liarDf = binaryLable.classifierRelOrFake(liarDf)
-testEncoded, testLabels = formatting.bow(liarDf)
-
-
-encoded, labels = formatting.bow(test)
-labels = np.array(labels)
-encoded = np.array(encoded) 
-
-#predictions on test dataset from FakeNewsCorpus
-x_testA = simpleModels.numberOfAuthors(test)
-x_testA = np.array(x_testA)
-y_predA = authorMod.predict(x_testA)
-
-
-liarDf = clean.cleanChunkyDF('train.tsv', 1000, 10000)
-liarDf = binaryLable.classifierRelOrFake(liarDf)
-combinedEncoded,combinedLabels,split = formatting.combine(df,liarDf)
-
-encoded,labels,split = formatting.split(df,liarDf)
-
-metrics,trainedModel = advModels.LSTM(encoded,labels,split=split)
-
-
-advModels.LSTM()
-advModels.LSTM(testEncoded,testLabels,split=0,ifTrain=False,trainedModel=trainedModel)
-'''
-#-------------------------------------------------------------------------------------------
-
-df = clean.cleanChunkyDF("train.csv", 1000, 100000, None)
 df = binaryLable.classifierRelOrFake(df)
 
 #split data
@@ -115,33 +64,20 @@ trainTest,testSplit = binaryLable.combine(train,test)
 encoded, labels = formatting.bow(trainVal)
 trainTestEncoded,trainTestLabels = formatting.bow(trainTest)
 
-y_predA, authorMod = simpleModels.predictByAuthors(trainVal, labels, split)
-y_predLog, logMod = simpleModels.bow_logreg(encoded, labels, split)
-
-
-y_predNB, nb = naiveBayesClassifier.naive_bayes_content(encoded,labels,split)
-
-metric,trainedModel = advModels.LSTM(encoded,labels,split=split)
-
+#prepare the liar data for testing
 liar = clean.cleanChunkyDF("train.tsv", 1000, 10000, "\t")
 liar = binaryLable.classifierRelOrFake(liar)
 
 corpusLiar,split = binaryLable.combine(train,liar)
-
 encoded,labels = formatting.bow(corpusLiar)
 
-#Train Liar
-
-_predA, authorMod = simpleModels.predictByAuthors(corpusLiar, labels, split)
+#Test the models on Liar data
 y_predLog, logMod = simpleModels.bow_logreg(encoded, labels, split)
-
 advModels.LSTM(encoded,labels,split=split)
 naiveBayesClassifier.naive_bayes_content(encoded,labels,split)
 
-#Train val
-
+#Train on test data from FakeNewsCorpus
 _predA, authorMod = simpleModels.predictByAuthors(trainTest,trainTestLabels,testSplit)
 y_predLog, logMod = simpleModels.bow_logreg(trainTestEncoded,trainTestLabels,testSplit)
-
 advModels.LSTM(trainTestEncoded,trainTestLabels,split=testSplit)
-naiveBayesClassifier.naive_bayes_content(trainTestEncoded,trainTestLabels,testSplit)
+y_predNB, nb = naiveBayesClassifier.naive_bayes_content(trainTestEncoded,trainTestLabels,testSplit)
