@@ -4,6 +4,8 @@ We are Group 15, this is our exam project in Data Science, hand-in 31st March 20
 
 We were tasked with training a simple and advanced model on a dataset of articles, classified according to their relative reliability, to then use for predicting binary labels on a different data set.
 
+It you wish to reproduce our dataexploration and graphs, uncomment the specific parts in the main.py file.
+
 The data sets used are the FakeNewsCorpus, the entire 27GB. Here we split the first 100.000 rows into training, test and validation sets (80%, 10%, 10%). You can acces the corpus here:
 
 https://github.com/several27/FakeNewsCorpus/releases/tag/v1.0.
