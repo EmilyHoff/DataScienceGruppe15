@@ -7,7 +7,6 @@ to then use for predicting binary labels on a different data set.
 
 To run this our program, navigate to the directory in where main.py lies, and ensure that the relevant .csv and .tsv files are located there too
 
-Type in:
-        $ python3 main.py
+Type in (without quote marks): "python3 main.py"
 
 sit back, and enjoy :) 
