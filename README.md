@@ -6,6 +6,7 @@ We were tasked with training a simple and advanced model on a dataset of article
 to then use for predicting binary labels on a different data set.
 
 To run this our program, navigate to the directory in where main.py lies, and ensure that the relevant .csv and .tsv files are located there too
+
 Type in:
         $ python3 main.py
 
