@@ -3,6 +3,7 @@ from multiprocessing.dummy import active_children
 import os
 import shutil
 from tkinter import E
+from xmlrpc.server import list_public_methods
 import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
@@ -16,16 +17,14 @@ import wandb
 
 import os
 
-def LSTM(encoded,labels,split,vocab_size=None,embedding_matrix=None):
-
-    trainX = tf.convert_to_tensor(encoded,dtype=tf.float32)
-    trainY = tf.convert_to_tensor(labels)
-    
-    testX = tf.convert_to_tensor(encoded[split:],dtype=tf.float32)
-    testY = tf.convert_to_tensor(labels[split:])    
-    
-    print(f"Lenght of train: {trainX}")
-    print(f"Length of train y: {trainY}")
+def LSTM(encoded,labels,split,ifTrain=True,trainedModel=None):
+  if ifTrain:
+    trainX = tf.convert_to_tensor(encoded[:split],dtype=tf.float32)
+    trainY = tf.convert_to_tensor(labels[:split])
+  
+  testX = tf.convert_to_tensor(encoded[split:],dtype=tf.float32)
+  testY = tf.convert_to_tensor(labels[split:]) 
+  if ifTrain:
 
     batch_size = 32
 
@@ -61,9 +60,15 @@ def LSTM(encoded,labels,split,vocab_size=None,embedding_matrix=None):
         x_batch = trainX[i*batch_size:(i+1)*batch_size]
         y_batch = trainY[i*batch_size:(i+1)*batch_size]
         LSTMModel.fit(x_batch, y_batch,class_weight={0:1,1:1})
-        
+      
     metric = LSTMModel.evaluate(testX,testY)
+    print(f"Metrics for LSTM: {metric}")
+    return metric,LSTMModel
+  else:
+    metric = trainedModel.evaluate(testX,testY)
+    print(f"Metrics for LSTM: {metric}")
     return metric
+      
 
 
 
