@@ -2,15 +2,16 @@
 
 We are Group 15, this is our exam project in Data Science, hand-in 31st March 2023.
 
-We were tasked with training a simple and advanced model on a dataset of articles, classified according to their relative reliability, 
-to then use for predicting binary labels on a different data set.
+We were tasked with training a simple and advanced model on a dataset of articles, classified according to their relative reliability, to then use for predicting binary labels on a different data set.
 
-The data sets used are the FakeNewsCorpus, the entire 27GB. Here we trained our models upon 100.000 rows, and validated them on 20.000 rows
-from the same set. 
-For our test, we used the LIAR data set, using the train.tsv file, and 10.000 rows in there.
+The data sets used are the FakeNewsCorpus, the entire 27GB. Here we split the first 100.000 rows into training, test and validation sets (80%, 10%, 10%). You can acces the corpus here:
 
-To run this program, navigate to the directory in where main.py lies, and ensure that the relevant .csv and .tsv files are located there too
+https://github.com/several27/FakeNewsCorpus/releases/tag/v1.0.
 
-Type in (without quote marks): "python3 main.py"
+Simply download the files, unzip them and the resulting file, news_cleaned_2018_02_13.csv, is the one our entire models are trained on. To reproduce our test scores, you'll need the LIAR dataset. We test on the first 10.000 articles from the train.tsv file.
+
+If you ensure that news_cleaned_2018_02_13.csv and train.tsv is in the same directory as main.py then you compile the code, everything will run smoothly.
+
+To run this program, navigate to the directory in where main.py lies then run "python3 main.py" form your terminal.
 
 Sit back, and enjoy :) 
