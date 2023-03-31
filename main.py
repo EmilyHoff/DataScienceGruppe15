@@ -20,7 +20,7 @@ from Part1 import clean
 from Part2 import binaryLable
 from Part2 import naiveBayesClassifier
 from Part2 import simpleModels
-#from Part2 import advModels
+from Part2 import advModels
 
 from Part2 import formatting
 
@@ -67,15 +67,13 @@ y_predLog, logMod = simpleModels.bow_logreg(encoded, labels, split)
 y_predPer, perMod = simpleModels.bow_perceptron(encoded, labels, split)
 y_predNB, nb = naiveBayesClassifier.naive_bayes_content(encoded, labels, split)
 
-#produce the ROC-curves
-graphs.ROCcurve(y_predA, y_predLog, y_predPer, y_predNB, labels, split)
 
 #produce the confusionmetric 
 #graphs.confusionMetric(labels, split, y_predA, "Confusion Matrix - Predict by authors")
 
 #Evaluation part - test on LAIR and test data
-lairDf = clean.cleanChunkyDF('test.tsv', 100, 1000)
-lairDf = binaryLable.classifierRelOrFake(lairDf)
+liarDf = clean.cleanChunkyDF('train.tsv', 1000, 10000)
+liarDf = binaryLable.classifierRelOrFake(lairDf)
 
 encoded, labels = formatting.bow(test)
 labels = np.array(labels)

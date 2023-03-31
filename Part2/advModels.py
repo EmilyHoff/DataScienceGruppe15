@@ -8,27 +8,12 @@ import tensorflow_hub as hub
 import numpy as np
 import sys
 from sklearn.metrics import accuracy_score
-#from tensorflow.keras.models import Sequential
-#import fasttext
-#from tensorflow.keras import metrics
-import matplotlib.pyplot as plt
+from tensorflow.keras.models import Sequential
+import fasttext
+from tensorflow.keras import metrics
 
-from imblearn.over_sampling import SMOTE
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.ensemble import ExtraTreesClassifier
-
-from imblearn.under_sampling import RandomUnderSampler
-
-
-#sys.path.insert(0,"../")
-
-#import main
 import wandb
 
-#df = None
-
-#from transformers import pipeline
 import os
 
 def LSTM(encoded,labels,split,vocab_size=None,embedding_matrix=None):
